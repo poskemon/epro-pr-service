@@ -8,7 +8,7 @@ spring:
   datasource:
     url: jdbc:postgresql://pr-database.czmbu1hhyba3.ap-northeast-3.rds.amazonaws.com:5432/postgres
     username: postgres
-    password: poskemon1234!
+#    password: 
 
   jpa:
     hibernate:
