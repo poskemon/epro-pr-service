@@ -1,4 +1,4 @@
-package com.poskemon.epro.prservice.config;
+package com.poskemon.epro.prservice.common.config;
 
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.mybatis.spring.SqlSessionFactoryBean;
