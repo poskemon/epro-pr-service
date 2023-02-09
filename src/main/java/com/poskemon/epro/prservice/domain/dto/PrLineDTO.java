@@ -1,5 +1,6 @@
 package com.poskemon.epro.prservice.domain.dto;
 
+import java.sql.Date;
 import lombok.*;
 
 @Data
@@ -20,4 +21,5 @@ public class PrLineDTO {
     String buyer;
     String requester;
     String noteToBuyer;
+    Date needByDate;
 }

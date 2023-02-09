@@ -2,11 +2,11 @@ package com.poskemon.epro.prservice.controller;
 
 import com.poskemon.epro.prservice.domain.dto.PrLineDTO;
 import com.poskemon.epro.prservice.domain.dto.PurchaseUnitDTO;
+import java.sql.Date;
 import java.util.LinkedList;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 
@@ -32,7 +32,7 @@ public class PRController {
                 "3일",
                 "QBurnt Chaff_B-Flux",
                 "22PP000001",
-                1,
+                i+1,
                "Q2065363",
                 "Thermal lnsulation 1400",
                 "1000원",
@@ -40,7 +40,7 @@ public class PRController {
                  10,
                 "황동현",
                 "장건우" + i,
-                "빨리해줘" + i));
+                "빨리해줘", new Date(123,3,17)));
         }
 
         return list;
