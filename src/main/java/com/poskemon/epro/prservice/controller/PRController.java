@@ -28,19 +28,19 @@ public class PRController {
         List<PrLineDTO> list = new LinkedList<>();
         for (int i = 0; i < 22; i++) {
             list.add(new PrLineDTO("등록상태",
-                null,
-                "3일",
-                "QBurnt Chaff_B-Flux",
-                "22PP000001",
-                i+1,
-               "Q2065363",
-                "Thermal lnsulation 1400",
-                "1000원",
-                "box",
-                 10,
-                "황동현",
-                "장건우" + i,
-                "빨리해줘", new Date(123,3,17)));
+                                   null,
+                                   "3일",
+                                   "QBurnt Chaff_B-Flux",
+                                   (i < 5 ? "22PP000001" : "22PP000002"),
+                                   i + 1,
+                                   "Q2065363",
+                                   "Thermal lnsulation 1400",
+                                   "1000원",
+                                   "box",
+                                   10,
+                                   "황동현",
+                                   "장건우" + i,
+                                   "빨리해줘", new Date(123, 3, 17)));
         }
 
         return list;
