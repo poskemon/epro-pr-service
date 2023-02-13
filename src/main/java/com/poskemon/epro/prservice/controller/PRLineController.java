@@ -7,9 +7,12 @@ import com.poskemon.epro.prservice.domain.entity.PrHeader;
 import com.poskemon.epro.prservice.domain.entity.PrLine;
 import com.poskemon.epro.prservice.service.ItemService;
 import java.util.List;
+
+import com.poskemon.epro.prservice.service.PrLineService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -17,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class PRLineController {
 
     private final ItemService itemService;
+    private final PrLineService prLineService;
 
     /**
      * 아이템 목록 조회
@@ -28,7 +32,7 @@ public class PRLineController {
     }
 
     @PostMapping("/pr")
-    public PrResponse prResgist(List<PrLine> prLines, PrHeader prHeader) {
-        return null;
+    public PrResponse prResgist(@RequestBody PrRequest prRequest) {
+        return prLineService.prRegist(prRequest.getPrHeader(), prRequest.getPrLines());
     }
 }
