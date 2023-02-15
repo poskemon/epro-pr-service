@@ -1,14 +1,15 @@
 package com.poskemon.epro.prservice.domain.entity;
 
+import com.poskemon.epro.prservice.common.constants.PrStatus;
 import java.time.LocalDateTime;
 import javax.persistence.Column;
+import javax.persistence.Convert;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
-import javax.persistence.UniqueConstraint;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -51,4 +52,7 @@ public class PrHeader {
 
     @Column(name = "pr_status")
     private String prStatus; // pr 진행상태
+
+    @Column(name = "pr_price")
+    private Long prPrice; // pr Lines 총 금액
 }

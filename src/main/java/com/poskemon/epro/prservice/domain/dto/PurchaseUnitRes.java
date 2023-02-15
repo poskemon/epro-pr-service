@@ -5,7 +5,7 @@ import lombok.*;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class PurchaseUnitDTO {
+public class PurchaseUnitRes {
     String prNo;
     String prTitle;
     String requester;
@@ -14,4 +14,5 @@ public class PurchaseUnitDTO {
     String itemSpec;
     String prStatus;
     String category;
+    Long rfqNo;
 }

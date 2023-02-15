@@ -1,7 +1,7 @@
 package com.poskemon.epro.prservice.domain.entity;
 
 import java.time.LocalDate;
-import java.util.Date;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -52,6 +52,9 @@ public class PrLine {
 
     @Column(name = "pr_quantity")
     private Long prQuantity; // 수량
+
+    @Column(name = "pr_line_price")
+    private Long prLinePrice; // 금액(단가 * 수량)
 
     @Column(name = "note_to_buyer")
     private String noteToBuyer; // 요청 사항
