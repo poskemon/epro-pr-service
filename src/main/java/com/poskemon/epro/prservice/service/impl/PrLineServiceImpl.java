@@ -11,9 +11,9 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -47,7 +47,11 @@ public class PrLineServiceImpl implements PrLineService {
             resPrLines.add(prLine);
         }
         List<PrLine> savedPrLines = prLineRepository.saveAll(resPrLines);
-
         return savedPrLines;
+    }
+
+    @Override
+    public Integer changeStatus(String prStatus, String prNo) {
+        return prHeaderRepository.changeStatus(prStatus, prNo);
     }
 }

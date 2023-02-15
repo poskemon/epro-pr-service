@@ -6,4 +6,5 @@ import java.util.List;
 
 public interface PrLineService {
     public List<PrLine> prRegist(PrHeader prHeader, List<PrLine> prLines);
+    public Integer changeStatus(String prStatus, String prNo);
 }
