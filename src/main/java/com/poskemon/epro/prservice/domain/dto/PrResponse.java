@@ -25,8 +25,8 @@ public class PrResponse<T> {
     @JsonProperty("PR_HEADER")
     private PrHeader prHeader;
 
-    @JsonProperty("PR_LINE_LIST")
-    private List<PrLine> prLineList;
+    @JsonProperty("PR_CREATE_LIST")
+    private List<PrCreateRes> prCreateRes;
 
     @JsonProperty("ITEM_LIST")
     private List<Item> itmeList;
