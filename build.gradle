@@ -38,6 +38,14 @@ dependencies {
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     // Eureka-client
     implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client'
+    // webClient
+    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-webflux'
+    implementation group: 'org.projectreactor', name: 'reactor-spring', version: '1.0.1.RELEASE'
+    // loadbalancer
+    implementation 'org.springframework.cloud:spring-cloud-starter-loadbalancer'
+    // resilience4j (aop 필수)
+    implementation 'org.springframework.boot:spring-boot-starter-aop'
+    implementation 'org.springframework.cloud:spring-cloud-starter-circuitbreaker-resilience4j'
 }
 
 dependencyManagement {
