@@ -11,17 +11,17 @@ import com.poskemon.epro.prservice.service.ItemService;
 
 import java.util.List;
 
-import com.poskemon.epro.prservice.service.PrLineService;
+import com.poskemon.epro.prservice.service.PrService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
-public class PrLineController {
+public class PrController {
 
     private final ItemService itemService;
-    private final PrLineService prLineService;
+    private final PrService prService;
 
     /**
      * 아이템 목록 조회
@@ -41,13 +41,13 @@ public class PrLineController {
      * pr 등록
      *
      * @param prRequest 등록 내용
-     * @return prHeader, prLines
+     * @return
      */
     @PostMapping("/pr")
-    public ResponseEntity<PrResponse> prResgist(@RequestBody PrRequest prRequest) {
+    public ResponseEntity<?> prResgist(@RequestBody PrRequest prRequest) {
         try {
-            PrResponse prResponse = prLineService.prRegist(prRequest.getPrHeader(), prRequest.getPrLines());
-            return ResponseEntity.ok().body(prResponse);
+            Long prHeaderSeq = prService.prRegist(prRequest.getPrHeader(), prRequest.getPrLines());
+            return ResponseEntity.ok().body(prHeaderSeq);
         } catch (Exception e) {
             PrResponse prResponse = PrResponse.builder().message("구매 요청 저장에 실패하였습니다.").build();
             return ResponseEntity.badRequest().body(prResponse);
@@ -63,7 +63,7 @@ public class PrLineController {
     public ResponseEntity<PrResponse> changeStatus(@RequestBody PrHeader prHeader) {
         try {
             String status = PrStatus.valueOfName(prHeader.getPrStatus()).getPrStatus();
-            prLineService.changeStatus(status, prHeader.getPrNo());
+            prService.changeStatus(status, prHeader.getPrNo());
             PrResponse prResponse = PrResponse.builder().message("진행 상태가 변경되었습니다.").build();
             return ResponseEntity.ok().body(prResponse);
         } catch (Exception e) {
@@ -81,8 +81,8 @@ public class PrLineController {
     @GetMapping("/pr/{prHeaderSeq}")
     public ResponseEntity<PrResponse> getPrDetails(@PathVariable Long prHeaderSeq) {
         try {
-            PrHeader prHedaer = prLineService.getPrHeaderDetail(prHeaderSeq);
-            List<PrDetailRes> prDetailResList = prLineService.getPrDetail(prHedaer);
+            PrHeader prHedaer = prService.getPrHeaderDetail(prHeaderSeq);
+            List<PrDetailRes> prDetailResList = prService.getPrDetail(prHedaer);
             PrResponse prResponse = PrResponse.builder().prHeader(prHedaer).prLines(prDetailResList).build();
             return ResponseEntity.ok().body(prResponse);
         } catch (Exception e) {

@@ -48,18 +48,11 @@ public class WebClientServiceImpl implements WebClientService {
     }
 
     @Override
+    @CircuitBreaker(name = "hello4j", fallbackMethod = "findAllFallback")
     public List<UserDTO> findUsersByRole(int role) {
         Mono<UserDTO[]> result = webclientFindUsersByRole(role);
         return Arrays.stream(result.block()).collect(Collectors.toList());
     }
-
-//    private Mono<UserDTO[]> webclientFindUsersByRole(int role) {
-//        return loadBalancedWebClientBuilder().filter(lbFunction).build()
-//                .get()
-//                .uri("http://172.30.1.10:8080/role/" + role)
-//                .retrieve()
-//                .bodyToMono(UserDTO[].class);
-//    }
 
     private Mono<UserDTO[]> webclientFindUsersByRole(int role) {
         WebClient webClient = WebClient.create();
