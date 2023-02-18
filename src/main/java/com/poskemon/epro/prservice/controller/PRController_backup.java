@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @Slf4j
-public class PRController {
+public class PRController_backup {
 
     /**
      * Pr line 조회

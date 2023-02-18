@@ -2,22 +2,19 @@ package com.poskemon.epro.prservice.controller;
 
 import com.poskemon.epro.prservice.common.constants.Message;
 import com.poskemon.epro.prservice.common.constants.PrStatus;
-import com.poskemon.epro.prservice.domain.dto.PrCreateRes;
+import com.poskemon.epro.prservice.domain.dto.PrDetailRes;
 import com.poskemon.epro.prservice.domain.dto.PrRequest;
 import com.poskemon.epro.prservice.domain.dto.PrResponse;
 import com.poskemon.epro.prservice.domain.entity.Item;
 import com.poskemon.epro.prservice.domain.entity.PrHeader;
 import com.poskemon.epro.prservice.service.ItemService;
+
 import java.util.List;
 
 import com.poskemon.epro.prservice.service.PrLineService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -70,8 +67,26 @@ public class PrLineController {
             PrResponse prResponse = PrResponse.builder().message("진행 상태가 변경되었습니다.").build();
             return ResponseEntity.ok().body(prResponse);
         } catch (Exception e) {
-            PrResponse prResponse = PrResponse.builder().message("진행 상태가 변경되지 않았습니다.").build();
+            PrResponse prResponse = PrResponse.builder().message(e.getMessage()).build();
             return ResponseEntity.badRequest().body(prResponse);
+        }
+    }
+
+    /**
+     * 구매신청 상세조회
+     *
+     * @param prHeaderSeq
+     * @return
+     */
+    @GetMapping("/pr/{prHeaderSeq}")
+    public ResponseEntity<PrResponse> getPrDetails(@PathVariable Long prHeaderSeq) {
+        try {
+            PrHeader prHedaer = prLineService.getPrHeaderDetail(prHeaderSeq);
+            List<PrDetailRes> prDetailResList = prLineService.getPrDetail(prHedaer);
+            PrResponse prResponse = PrResponse.builder().prHeader(prHedaer).prLines(prDetailResList).build();
+            return ResponseEntity.ok().body(prResponse);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(PrResponse.builder().message(e.getMessage()).build());
         }
     }
 }

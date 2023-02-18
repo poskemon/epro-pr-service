@@ -3,9 +3,11 @@ package com.poskemon.epro.prservice.service.impl;
 import com.poskemon.epro.prservice.domain.dto.UserDTO;
 import com.poskemon.epro.prservice.service.WebClientService;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
+
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cloud.client.loadbalancer.reactive.ReactorLoadBalancerExchangeFilterFunction;
@@ -16,7 +18,7 @@ import reactor.core.publisher.Mono;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class WebClientServiceImpl implements WebClientService  {
+public class WebClientServiceImpl implements WebClientService {
 
     private final ReactorLoadBalancerExchangeFilterFunction lbFunction;
 
@@ -39,10 +41,33 @@ public class WebClientServiceImpl implements WebClientService  {
         log.info(temp);
 
         return loadBalancedWebClientBuilder().filter(lbFunction).build()
-                                             .get()
-                                             .uri("http://user-service/users/" + temp)
-                                             .retrieve()
-                                             .bodyToMono(UserDTO[].class);
+                .get()
+                .uri("http://user-service/users/" + temp)
+                .retrieve()
+                .bodyToMono(UserDTO[].class);
+    }
+
+    @Override
+    public List<UserDTO> findUsersByRole(int role) {
+        Mono<UserDTO[]> result = webclientFindUsersByRole(role);
+        return Arrays.stream(result.block()).collect(Collectors.toList());
+    }
+
+//    private Mono<UserDTO[]> webclientFindUsersByRole(int role) {
+//        return loadBalancedWebClientBuilder().filter(lbFunction).build()
+//                .get()
+//                .uri("http://172.30.1.10:8080/role/" + role)
+//                .retrieve()
+//                .bodyToMono(UserDTO[].class);
+//    }
+
+    private Mono<UserDTO[]> webclientFindUsersByRole(int role) {
+        WebClient webClient = WebClient.create();
+        return webClient
+                .get()
+                .uri("http://localhost:8080/role/" + role)
+                .retrieve()
+                .bodyToMono(UserDTO[].class);
     }
 
     private List<?> findAllFallback(Exception e) {

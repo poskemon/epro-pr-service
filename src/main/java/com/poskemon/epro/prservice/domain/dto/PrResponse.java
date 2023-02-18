@@ -4,10 +4,10 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import com.poskemon.epro.prservice.domain.entity.Item;
+
 import java.util.List;
 
 import com.poskemon.epro.prservice.domain.entity.PrHeader;
-import com.poskemon.epro.prservice.domain.entity.PrLine;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -25,8 +25,8 @@ public class PrResponse<T> {
     @JsonProperty("PR_HEADER")
     private PrHeader prHeader;
 
-    @JsonProperty("PR_CREATE_LIST")
-    private List<PrCreateRes> prCreateRes;
+    @JsonProperty("PR_LINE_LIST")
+    private List<PrDetailRes> prLines;
 
     @JsonProperty("ITEM_LIST")
     private List<Item> itmeList;
