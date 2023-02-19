@@ -98,16 +98,39 @@ public class PrController {
      */
     @PutMapping("/pr")
     public ResponseEntity<?> modifyPr(@RequestBody PrRequest prRequest) {
-        // 승인요청, 승인완료 상태인지 확인
-        Long prHeaderSeq = prRequest.getPrHeader().getPrHeaderSeq();
-        PrHeader prHeader = prService.getPrHeaderDetail(prHeaderSeq);
+        try {
+            // 승인요청, 승인완료 상태인지 확인
+            Long prHeaderSeq = prRequest.getPrHeader().getPrHeaderSeq();
+            PrHeader prHeader = prService.getPrHeaderDetail(prHeaderSeq);
+            if (!PrStatus.ENROLLED.getPrStatus().equals(prHeader.getPrStatus())) {
+                throw new RuntimeException("현재 구매신청 건은 변경할 수 없습니다.");
+            }
 
-        // TODO - 승인요청 상태에서도 변경 불가능한거 맞는지 확인
-        if(!PrStatus.ENROLLED.getPrStatus().equals(prHeader.getPrStatus())) {
-            return ResponseEntity.badRequest().body("현재 구매신청 건은 변경할 수 없습니다.");
+            Long modifiedPrHeaderSeq = prService.modifyPr(prRequest);
+            return ResponseEntity.ok().body(modifiedPrHeaderSeq);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
         }
+    }
 
-        Long modifiedPrHeaderSeq = prService.modifyPr(prRequest);
-        return ResponseEntity.ok().body(modifiedPrHeaderSeq);
+    /**
+     * 구매신청 삭제
+     * 승인요청 상태에서 구매신청 내용을 변경하고 싶은 경우 삭제 후 다시 등록해야 함.
+     *
+     * @param prHeaderSeq
+     */
+    @DeleteMapping("/pr/{prHeaderSeq}")
+    public ResponseEntity<String> deletePr(@PathVariable Long prHeaderSeq) {
+        try {
+            // 승인완료 상태인지 확인
+            PrHeader prHeader = prService.getPrHeaderDetail(prHeaderSeq);
+            if (PrStatus.APPROVED.getPrStatus().equals(prHeader.getPrStatus())) {
+               throw new RuntimeException("승인완료된 구매신청 건은 삭제할 수 없습니다.");
+            }
+            prService.deletePr(prHeaderSeq);
+            return ResponseEntity.ok().body("삭제 완료되었습니다.");
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 }

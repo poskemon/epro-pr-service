@@ -105,7 +105,9 @@ public class PrServiceImpl implements PrService {
     @Transactional
     public Long modifyPr(PrRequest prRequest) {
         PrHeader prHeader = prHeaderRepository.save(prRequest.getPrHeader());
-        // prHeaderSeq에 해당하는 prLine 수정
+        // prHeaderSeq에 해당하는 prLine 삭제
+        prLineRepository.deleteAllByPrHeader(prHeader);
+        // prLines 등록
         List<PrLine> prLines = new LinkedList<>();
         for (PrLine prLine : prRequest.getPrLines()) {
             prLine.setPrHeader(prHeader);
@@ -113,5 +115,13 @@ public class PrServiceImpl implements PrService {
         }
         prLineRepository.saveAll(prLines);
         return prHeader.getPrHeaderSeq();
+    }
+
+    @Override
+    @Transactional
+    public void deletePr(Long prHeaderSeq) {
+        PrHeader prHeader = prHeaderRepository.findByPrHeaderSeq(prHeaderSeq);
+        prLineRepository.deleteAllByPrHeader(prHeader);
+        prHeaderRepository.deleteById(prHeaderSeq);
     }
 }

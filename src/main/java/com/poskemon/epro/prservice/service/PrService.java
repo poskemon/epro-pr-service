@@ -17,4 +17,6 @@ public interface PrService {
     List<PrDetailRes> getPrDetail(PrHeader prHeader);
 
     Long modifyPr(PrRequest prRequest);
+
+    void deletePr(Long prHeaderSeq);
 }

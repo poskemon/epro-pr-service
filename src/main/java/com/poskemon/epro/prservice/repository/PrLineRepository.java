@@ -10,4 +10,5 @@ import java.util.List;
 @Repository
 public interface PrLineRepository extends JpaRepository<PrLine, Long> {
     List<PrLine> findAllByPrHeader(PrHeader prHeader);
+    void deleteAllByPrHeader(PrHeader prHeader);
 }
