@@ -13,7 +13,7 @@ public interface PrHeaderRepository extends JpaRepository<PrHeader, Long> {
     @Transactional
     @Modifying
     @Query(nativeQuery = true, value = "update pr_header set pr_status = :prStatus where pr_no = :prNo")
-    Integer changeStatus(@Param("prStatus") String prStatus, @Param("prNo") String prNo);
+    void changeStatus(@Param("prStatus") String prStatus, @Param("prNo") String prNo);
 
     PrHeader findByPrHeaderSeq(Long prHeaderSeq);
 }

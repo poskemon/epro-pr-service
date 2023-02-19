@@ -9,6 +9,9 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/**
+ * 아이템(Item) 엔티티
+ */
 @Data
 @Entity
 @Builder

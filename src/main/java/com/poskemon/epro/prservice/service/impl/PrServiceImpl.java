@@ -35,6 +35,13 @@ public class PrServiceImpl implements PrService {
     private final ItemRepository itemRepository;
     private final WebClientService webClientService;
 
+    /**
+     * PR 등록
+     *
+     * @param prHeader 등록할 PrHeader
+     * @param prLines  등록할 PrLines
+     * @return 등록된 prHeader 기본키 (prHeaderSeq)
+     */
     @Override
     @Transactional
     public Long prRegist(PrHeader prHeader, List<PrLine> prLines) {
@@ -62,18 +69,37 @@ public class PrServiceImpl implements PrService {
         return savedPrHeader.getPrHeaderSeq();
     }
 
+    /**
+     * 상태 변경 (승인요청, 승인완료)
+     *
+     * @param prStatus 변경하려는 상태
+     * @param prNo     변경하려는 prNo
+     */
     @Override
-    public Integer changeStatus(String prStatus, String prNo) {
-        return prHeaderRepository.changeStatus(prStatus, prNo);
+    public void changeStatus(String prStatus, String prNo) {
+        prHeaderRepository.changeStatus(prStatus, prNo);
     }
 
+    /**
+     * PrHeader 상세 조회
+     *
+     * @param prHeaderSeq 조회하려는 prHeader의 기본키 값
+     * @return 조회된 PrHeader
+     */
     @Override
     public PrHeader getPrHeaderDetail(Long prHeaderSeq) {
         return prHeaderRepository.findByPrHeaderSeq(prHeaderSeq);
     }
 
+    /**
+     * PrLines 상세 조회
+     * PrHeader 값으로 PrLines를 조회하고, buyer 이름은 webClient를 통해 user 서비스에서 가져옴
+     *
+     * @param prHeader 상세 조회하려는 PrHeader
+     * @return 조회된 PrLines
+     */
     @Override
-    public List<PrDetailRes> getPrDetail(PrHeader prHeader) {
+    public List<PrDetailRes> getPrLinesDetail(PrHeader prHeader) {
         List<PrLine> prLines = prLineRepository.findAllByPrHeader(prHeader);
 
         // item 조회
@@ -88,7 +114,7 @@ public class PrServiceImpl implements PrService {
 
         // buyer 조회
         List<Long> buyerNos = prLines.stream().map(prLine -> prLine.getBuyerNo()).collect(Collectors.toList());
-        List<UserDTO> users = webClientService.findByBuyerNo(buyerNos);
+        List<UserDTO> users = webClientService.findUsersByUserNo(buyerNos);
         if (!Objects.isNull(users)) {
             for (int i = 0; i < prDetailResList.size(); i++) {
                 Long buyerNo = prDetailResList.get(i).getBuyerNo();
@@ -101,6 +127,12 @@ public class PrServiceImpl implements PrService {
         return prDetailResList;
     }
 
+    /**
+     * PR 수정
+     *
+     * @param prRequest 수정 내용 (PrHeader, PrLines)
+     * @return prHeaderSeq (수정된 PrHeader의 기본키 값)
+     */
     @Override
     @Transactional
     public Long modifyPr(PrRequest prRequest) {
@@ -117,6 +149,12 @@ public class PrServiceImpl implements PrService {
         return prHeader.getPrHeaderSeq();
     }
 
+    /**
+     * PR 삭제
+     * PrHeader와 PrLines를 모두 삭제한다.
+     *
+     * @param prHeaderSeq 삭제하려는 PrHeader의 기본키 값
+     */
     @Override
     @Transactional
     public void deletePr(Long prHeaderSeq) {

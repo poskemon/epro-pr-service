@@ -10,11 +10,11 @@ import java.util.List;
 public interface PrService {
     Long prRegist(PrHeader prHeader, List<PrLine> prLines);
 
-    Integer changeStatus(String prStatus, String prNo);
+    void changeStatus(String prStatus, String prNo);
 
     PrHeader getPrHeaderDetail(Long prHeaderSeq);
 
-    List<PrDetailRes> getPrDetail(PrHeader prHeader);
+    List<PrDetailRes> getPrLinesDetail(PrHeader prHeader);
 
     Long modifyPr(PrRequest prRequest);
 

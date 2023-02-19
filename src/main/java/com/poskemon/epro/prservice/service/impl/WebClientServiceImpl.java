@@ -26,10 +26,15 @@ public class WebClientServiceImpl implements WebClientService {
         return WebClient.builder();
     }
 
+    /**
+     * 사용자 번호로 조회
+     * @param userNos 조회하려는 사용자 번호 리스트
+     * @return 조회된 사용자 리스트
+     */
     @Override
     @CircuitBreaker(name = "hello4j", fallbackMethod = "findAllFallback")
-    public List<UserDTO> findByBuyerNo(List<Long> buyerNoList) {
-        Mono<UserDTO[]> result = webclientFindByBuyerNo(buyerNoList);
+    public List<UserDTO> findUsersByUserNo(List<Long> userNos) {
+        Mono<UserDTO[]> result = webclientFindUsersByUserNo(userNos);
         return Arrays.stream(result.block()).collect(Collectors.toList());
     }
 
@@ -48,11 +53,11 @@ public class WebClientServiceImpl implements WebClientService {
 //                .bodyToMono(UserDTO[].class);
 //    }
 
-    private Mono<UserDTO[]> webclientFindByBuyerNo(List<Long> buyerNoList) {
+    private Mono<UserDTO[]> webclientFindUsersByUserNo(List<Long> userNos) {
         WebClient webClient = WebClient.create();
-        StringBuilder temp = new StringBuilder(buyerNoList.get(0).toString());
-        for (int i = 1; i < buyerNoList.size(); i++) {
-            temp.append(",").append(buyerNoList.get(i));
+        StringBuilder temp = new StringBuilder(userNos.get(0).toString());
+        for (int i = 1; i < userNos.size(); i++) {
+            temp.append(",").append(userNos.get(i));
         }
         log.info(temp.toString());
 
@@ -63,6 +68,11 @@ public class WebClientServiceImpl implements WebClientService {
                 .bodyToMono(UserDTO[].class);
     }
 
+    /**
+     * 권한별 조회
+     * @param role 사용부서(1), 바이어(2), 공급사(3), 슈퍼바이어(4)
+     * @return 조회된 사용자 리스트
+     */
     @Override
     @CircuitBreaker(name = "hello4j", fallbackMethod = "findAllFallback")
     public List<UserDTO> findUsersByRole(int role) {
@@ -79,6 +89,11 @@ public class WebClientServiceImpl implements WebClientService {
                 .bodyToMono(UserDTO[].class);
     }
 
+    /**
+     * 다른 서비스 장애 발생시 실행되는 fallback 메소드
+     * @param e error
+     * @return null
+     */
     private List<?> findAllFallback(Exception e) {
         e.printStackTrace();
         log.error("fallback invoked!");
