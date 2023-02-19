@@ -2,9 +2,11 @@ package com.poskemon.epro.prservice.controller;
 
 import com.poskemon.epro.prservice.common.constants.Message;
 import com.poskemon.epro.prservice.common.constants.PrStatus;
+import com.poskemon.epro.prservice.common.constants.UserRole;
 import com.poskemon.epro.prservice.domain.dto.PrDetailRes;
 import com.poskemon.epro.prservice.domain.dto.PrRequest;
 import com.poskemon.epro.prservice.domain.dto.PrResponse;
+import com.poskemon.epro.prservice.domain.dto.UserDTO;
 import com.poskemon.epro.prservice.domain.entity.Item;
 import com.poskemon.epro.prservice.domain.entity.PrHeader;
 import com.poskemon.epro.prservice.service.ItemService;
@@ -12,7 +14,9 @@ import com.poskemon.epro.prservice.service.ItemService;
 import java.util.List;
 
 import com.poskemon.epro.prservice.service.PrService;
+import com.poskemon.epro.prservice.service.WebClientService;
 import lombok.RequiredArgsConstructor;
+import org.apache.catalina.User;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -22,6 +26,7 @@ public class PrController {
 
     private final ItemService itemService;
     private final PrService prService;
+    private final WebClientService webClientService;
 
     /**
      * 아이템 목록 조회
@@ -35,6 +40,17 @@ public class PrController {
             return PrResponse.builder().message(Message.NOT_FOUND_ITEMS.getMessage()).build();
         }
         return PrResponse.builder().itmeList(foundItems).build();
+    }
+
+    /**
+     * 바이어 전체 조회
+     *
+     * @return
+     */
+    @GetMapping("/buyers")
+    public List<UserDTO> findAllBuyers() {
+        List<UserDTO> users = webClientService.findUsersByRole(UserRole.BUYER.getCode());
+        return users;
     }
 
     /**
@@ -125,7 +141,7 @@ public class PrController {
             // 승인완료 상태인지 확인
             PrHeader prHeader = prService.getPrHeaderDetail(prHeaderSeq);
             if (PrStatus.APPROVED.getPrStatus().equals(prHeader.getPrStatus())) {
-               throw new RuntimeException("승인완료된 구매신청 건은 삭제할 수 없습니다.");
+                throw new RuntimeException("승인완료된 구매신청 건은 삭제할 수 없습니다.");
             }
             prService.deletePr(prHeaderSeq);
             return ResponseEntity.ok().body("삭제 완료되었습니다.");

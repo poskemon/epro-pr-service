@@ -74,7 +74,7 @@ public class WebClientServiceImpl implements WebClientService {
         WebClient webClient = WebClient.create();
         return webClient
                 .get()
-                .uri("http://localhost:8080/role/" + role)
+                .uri("http://localhost:8081/role/" + role)
                 .retrieve()
                 .bodyToMono(UserDTO[].class);
     }
