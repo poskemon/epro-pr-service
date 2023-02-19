@@ -9,6 +9,9 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/**
+ * 구매신청 상세조회 결과
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

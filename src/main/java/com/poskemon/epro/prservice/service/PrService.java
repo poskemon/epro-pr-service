@@ -19,4 +19,6 @@ public interface PrService {
     Long modifyPr(PrRequest prRequest);
 
     void deletePr(Long prHeaderSeq);
+
+    List<PrLine> getAllPr();
 }

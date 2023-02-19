@@ -162,4 +162,23 @@ public class PrServiceImpl implements PrService {
         prLineRepository.deleteAllByPrHeader(prHeader);
         prHeaderRepository.deleteById(prHeaderSeq);
     }
+
+    @Override
+    public List<PrLine> getAllPr() {
+        List<PrHeader> prHeaders = prHeaderRepository.findAll();
+        List<PrLine> prLines = prLineRepository.findAll();
+
+        for (PrLine prLine : prLines) {
+            Long prHeaderSeq = prLine.getPrHeader().getPrHeaderSeq();
+            PrHeader prHeader = prHeaders.stream()
+                    .filter(header -> header.getPrHeaderSeq().equals(prHeaderSeq))
+                    .findFirst()
+                    .orElse(null);
+            if (prHeader != null) {
+                prLine.setPrHeader(prHeader);
+            }
+        }
+
+        return prLines;
+    }
 }
