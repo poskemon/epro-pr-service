@@ -49,7 +49,7 @@ public class PrController {
             Long prHeaderSeq = prService.prRegist(prRequest.getPrHeader(), prRequest.getPrLines());
             return ResponseEntity.ok().body(prHeaderSeq);
         } catch (Exception e) {
-            PrResponse prResponse = PrResponse.builder().message("구매 요청 저장에 실패하였습니다.").build();
+            PrResponse prResponse = PrResponse.builder().message(e.getMessage()).build();
             return ResponseEntity.badRequest().body(prResponse);
         }
     }
@@ -88,5 +88,26 @@ public class PrController {
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(PrResponse.builder().message(e.getMessage()).build());
         }
+    }
+
+    /**
+     * 구매신청 수정
+     *
+     * @param prRequest
+     * @return
+     */
+    @PutMapping("/pr")
+    public ResponseEntity<?> modifyPr(@RequestBody PrRequest prRequest) {
+        // 승인요청, 승인완료 상태인지 확인
+        Long prHeaderSeq = prRequest.getPrHeader().getPrHeaderSeq();
+        PrHeader prHeader = prService.getPrHeaderDetail(prHeaderSeq);
+
+        // TODO - 승인요청 상태에서도 변경 불가능한거 맞는지 확인
+        if(!PrStatus.ENROLLED.getPrStatus().equals(prHeader.getPrStatus())) {
+            return ResponseEntity.badRequest().body("현재 구매신청 건은 변경할 수 없습니다.");
+        }
+
+        Long modifiedPrHeaderSeq = prService.modifyPr(prRequest);
+        return ResponseEntity.ok().body(modifiedPrHeaderSeq);
     }
 }

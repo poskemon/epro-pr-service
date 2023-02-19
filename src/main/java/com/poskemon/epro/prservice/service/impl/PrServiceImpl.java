@@ -2,6 +2,7 @@ package com.poskemon.epro.prservice.service.impl;
 
 import com.poskemon.epro.prservice.common.constants.PrStatus;
 import com.poskemon.epro.prservice.domain.dto.PrDetailRes;
+import com.poskemon.epro.prservice.domain.dto.PrRequest;
 import com.poskemon.epro.prservice.domain.dto.UserDTO;
 import com.poskemon.epro.prservice.domain.entity.Item;
 import com.poskemon.epro.prservice.domain.entity.PrHeader;
@@ -56,7 +57,7 @@ public class PrServiceImpl implements PrService {
             prLine.setPrHeader(savedPrHeader);
             resPrLines.add(prLine);
         }
-        List<PrLine> savedPrLines = prLineRepository.saveAll(resPrLines);
+        prLineRepository.saveAll(resPrLines);
 
         return savedPrHeader.getPrHeaderSeq();
     }
@@ -71,7 +72,6 @@ public class PrServiceImpl implements PrService {
         return prHeaderRepository.findByPrHeaderSeq(prHeaderSeq);
     }
 
-    // TODO - buyer name 조회 방식 상의
     @Override
     public List<PrDetailRes> getPrDetail(PrHeader prHeader) {
         List<PrLine> prLines = prLineRepository.findAllByPrHeader(prHeader);
@@ -87,7 +87,8 @@ public class PrServiceImpl implements PrService {
         List<PrDetailRes> prDetailResList = prLines.stream().map(PrDetailRes::new).collect(Collectors.toList());
 
         // buyer 조회
-        List<UserDTO> users = webClientService.findUsersByRole(2);
+        List<Long> buyerNos = prLines.stream().map(prLine -> prLine.getBuyerNo()).collect(Collectors.toList());
+        List<UserDTO> users = webClientService.findByBuyerNo(buyerNos);
         if (!Objects.isNull(users)) {
             for (int i = 0; i < prDetailResList.size(); i++) {
                 Long buyerNo = prDetailResList.get(i).getBuyerNo();
@@ -98,5 +99,19 @@ public class PrServiceImpl implements PrService {
         }
 
         return prDetailResList;
+    }
+
+    @Override
+    @Transactional
+    public Long modifyPr(PrRequest prRequest) {
+        PrHeader prHeader = prHeaderRepository.save(prRequest.getPrHeader());
+        // prHeaderSeq에 해당하는 prLine 수정
+        List<PrLine> prLines = new LinkedList<>();
+        for (PrLine prLine : prRequest.getPrLines()) {
+            prLine.setPrHeader(prHeader);
+            prLines.add(prLine);
+        }
+        prLineRepository.saveAll(prLines);
+        return prHeader.getPrHeaderSeq();
     }
 }

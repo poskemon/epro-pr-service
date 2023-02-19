@@ -33,16 +33,32 @@ public class WebClientServiceImpl implements WebClientService {
         return Arrays.stream(result.block()).collect(Collectors.toList());
     }
 
-    private Mono<UserDTO[]> webclientFindByBuyerNo(List<Long> buyerNoList) {
-        String temp = buyerNoList.get(0).toString();
-        for (int i = 1; i < buyerNoList.size(); i++) {
-            temp += "," + buyerNoList.get(i);
-        }
-        log.info(temp);
+    // 게이트웨이에서 uri에서 lb를 사용할 경우 로드밸런싱 추가해야 함!
+//    private Mono<UserDTO[]> webclientFindByBuyerNo(List<Long> buyerNoList) {
+//        String temp = buyerNoList.get(0).toString();
+//        for (int i = 1; i < buyerNoList.size(); i++) {
+//            temp += "," + buyerNoList.get(i);
+//        }
+//        log.info(temp);
+//
+//        return loadBalancedWebClientBuilder().filter(lbFunction).build()
+//                .get()
+//                .uri("http://user-service/users/" + temp)
+//                .retrieve()
+//                .bodyToMono(UserDTO[].class);
+//    }
 
-        return loadBalancedWebClientBuilder().filter(lbFunction).build()
+    private Mono<UserDTO[]> webclientFindByBuyerNo(List<Long> buyerNoList) {
+        WebClient webClient = WebClient.create();
+        StringBuilder temp = new StringBuilder(buyerNoList.get(0).toString());
+        for (int i = 1; i < buyerNoList.size(); i++) {
+            temp.append(",").append(buyerNoList.get(i));
+        }
+        log.info(temp.toString());
+
+        return webClient
                 .get()
-                .uri("http://user-service/users/" + temp)
+                .uri("http://localhost:8081/users/" + temp)
                 .retrieve()
                 .bodyToMono(UserDTO[].class);
     }

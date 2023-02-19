@@ -1,6 +1,7 @@
 package com.poskemon.epro.prservice.service;
 
 import com.poskemon.epro.prservice.domain.dto.PrDetailRes;
+import com.poskemon.epro.prservice.domain.dto.PrRequest;
 import com.poskemon.epro.prservice.domain.entity.PrHeader;
 import com.poskemon.epro.prservice.domain.entity.PrLine;
 
@@ -14,4 +15,6 @@ public interface PrService {
     PrHeader getPrHeaderDetail(Long prHeaderSeq);
 
     List<PrDetailRes> getPrDetail(PrHeader prHeader);
+
+    Long modifyPr(PrRequest prRequest);
 }
