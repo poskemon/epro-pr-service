@@ -25,7 +25,7 @@ spring:
 eureka:
   instance:
     prefer-ip-address: true
-  #    ip-address:
+#    ip-address: 50.18.154.23
   client:
     register-with-eureka: true
     fetch-registry: true

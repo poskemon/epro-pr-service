@@ -1,7 +1,7 @@
 package com.poskemon.epro.prservice.controller;
 
 import com.poskemon.epro.prservice.domain.dto.PrLineDTO;
-import com.poskemon.epro.prservice.domain.dto.PurchaseUnitDTO;
+import com.poskemon.epro.prservice.domain.dto.PurchaseUnitRes;
 import java.sql.Date;
 import java.util.LinkedList;
 import java.util.List;
@@ -15,14 +15,14 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @Slf4j
-public class PRController {
+public class PRController_backup {
 
     /**
      * Pr line 조회
      * PurchaseUnitDTO condition     react에서 params로 전송
      */
     @GetMapping("/pr-line")
-    public List<PrLineDTO> prLine(PurchaseUnitDTO condition) {
+    public List<PrLineDTO> prLine(PurchaseUnitRes condition) {
         log.info("test");
         log.info(condition.toString());
         List<PrLineDTO> list = new LinkedList<>();
