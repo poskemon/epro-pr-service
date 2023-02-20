@@ -151,40 +151,14 @@ public class PrController {
         }
     }
 
-//    @GetMapping("/pr-line")
-//    public List<PrLine> getPrLinesForPrUnit(@RequestParam(required = false) Map<String, String> allParameters) {
-//        if (allParameters.isEmpty()) {
-//            return prService.getAllPr();
-//        }
-//        PurchaseUnitReq purchaseUnitReq = new PurchaseUnitReq();
-//        purchaseUnitReq.setPrNo(allParameters.getOrDefault("prNo", null));
-//        purchaseUnitReq.setPrTitle(allParameters.getOrDefault("prTitle", null));
-//        purchaseUnitReq.setItemDescription(allParameters.getOrDefault("itemDescription", null));
-//        purchaseUnitReq.setItemSpec(allParameters.getOrDefault("itemSpec", null));
-//        purchaseUnitReq.setCategory(allParameters.getOrDefault("category", null));
-//        purchaseUnitReq.setPrStatus(allParameters.getOrDefault("rfqNo", null));
-//
-//        if(allParameters.get("requesterNo").equals("")) {
-//            allParameters.put("requesterNo","0");
-//        }
-//        if(allParameters.get("buyerNo").equals("")) {
-//            allParameters.put("buyerNo","0");
-//        }
-//        purchaseUnitReq.setRequesterNo(Long.parseLong(allParameters.get("requesterNo")));
-//        purchaseUnitReq.setBuyerNo(Long.parseLong(allParameters.get("buyerNo")));
-//
-//        // TODO: Call appropriate method in prService and return results
-//        return null;
-//    }
-//
-//    @GetMapping("/pr-line")
-//    public List<PrLine> getPrLinesForPrUnit() {
-//        return prService.getAllPr();
-//    }
-//
-//    @GetMapping("/pr-line")
-//    public List<PrLine> getPrLinesForPrUnit(@RequestParam PurchaseUnitReq purchaseUnitReq) {
-//        return null;
-//    }
+    @GetMapping("/pr-line")
+    public ResponseEntity<?> getPrLinesForPrUnit(PurchaseUnitReq purchaseUnitReq) {
+        try {
+            List<PurchaseUnitRes> purchaseUnitResList = prService.getAllPrWithParams(purchaseUnitReq);
+            return ResponseEntity.ok().body(purchaseUnitResList);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
 
 }
