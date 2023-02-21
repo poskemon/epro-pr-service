@@ -27,7 +27,7 @@ public interface PrLineRepository extends JpaRepository<PrLine, Long> {
         "and (:#{#purchaseUnitReq.buyerNo} = -1L or pl.buyerNo = :#{#purchaseUnitReq.buyerNo}) " +
         "and (:#{#purchaseUnitReq.itemDescription} is null or i.itemDescription = :#{#purchaseUnitReq.itemDescription}) " +
         "and (:#{#purchaseUnitReq.spec} is null or i.spec = :#{#purchaseUnitReq.spec}) " +
-        "and (:#{#purchaseUnitReq.prStatus} is null or ph.prStatus = :#{#purchaseUnitReq.prStatus}) " +
+        "and (:#{#purchaseUnitReq.prStatus} is null or ph.prStatus = :#{#purchaseUnitReq.prStatus}) and ph.prStatus != :#{#purchaseUnitReq.except} " +
         "and (:#{#purchaseUnitReq.category} is null or i.category = :#{#purchaseUnitReq.category}) " +
         "and (:#{#purchaseUnitReq.rfqNo} = -1L or pl.rfqNo = :#{#purchaseUnitReq.rfqNo})")
     List<PrLine> findAllPrWithParams(@Param("purchaseUnitReq") PurchaseUnitReq purchaseUnitReq);

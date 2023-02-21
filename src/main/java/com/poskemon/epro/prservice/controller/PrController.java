@@ -154,6 +154,9 @@ public class PrController {
     @GetMapping("/pr-line")
     public ResponseEntity<?> getPrLinesForPrUnit(PurchaseUnitReq purchaseUnitReq) {
         try {
+            if(purchaseUnitReq.getExcept() == null) {
+                purchaseUnitReq.setExcept(PrStatus.ENROLLED.getPrStatus());
+            }
             if(purchaseUnitReq.getRequesterNo() == null) {
                 purchaseUnitReq.setRequesterNo(-1L);
             }

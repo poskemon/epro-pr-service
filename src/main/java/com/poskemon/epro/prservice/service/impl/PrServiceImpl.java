@@ -178,8 +178,6 @@ public class PrServiceImpl implements PrService {
 
     @Override
     public List<PurchaseUnitRes> getAllPrWithParams(PurchaseUnitReq purchaseUnitReq) {
-        // TODO - 등록상태 일 경우 조회되지 않도록 수정
-
         List<PrLine> prLines = prLineRepository.findAllPrWithParams(purchaseUnitReq);
         List<PurchaseUnitRes> purchaseUnitResList = prLines.stream()
                                                            .map(PurchaseUnitRes::new)
