@@ -14,7 +14,12 @@ public class RfqDTO {
     private LocalDate needByDate;
 
     public RfqDTO(PrLine prLine) {
-    this.rfqNo = prLine.getRfqNo();
-    this.needByDate = prLine.getNeedByDate();
+        this.rfqNo = prLine.getRfqNo();
+        this.needByDate = prLine.getNeedByDate();
+    }
+
+    public RfqDTO(RfqInterface rfqInterface) {
+        this.rfqNo = rfqInterface.getRfqNo();
+        this.needByDate = rfqInterface.getNeedByDate();
     }
 }

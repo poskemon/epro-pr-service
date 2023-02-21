@@ -2,6 +2,8 @@ package com.poskemon.epro.prservice.repository;
 
 import com.poskemon.epro.prservice.domain.dto.PrUpdateDTO;
 import com.poskemon.epro.prservice.domain.dto.PurchaseUnitReq;
+import com.poskemon.epro.prservice.domain.dto.RfqDTO;
+import com.poskemon.epro.prservice.domain.dto.RfqInterface;
 import com.poskemon.epro.prservice.domain.entity.PrHeader;
 import com.poskemon.epro.prservice.domain.entity.PrLine;
 import org.apache.ibatis.annotations.Param;
@@ -39,9 +41,11 @@ public interface PrLineRepository extends JpaRepository<PrLine, Long> {
         "and pl.prLine in (:#{#prUpdateDTO.prLines})")
     List<PrLine> findAllByPrNoAndPrLine(@Param("PrUpdateDTO") PrUpdateDTO prUpdateDTO);
 
+    // @Query(nativeQuery = true,
+    //        value = "select * from pr_line pl " +
+    //            "where pl.need_by_date = (select max(pl.need_by_date) as need_by_date from pr_line pl where pl.rfq_no in (:rfqNos)) " +
+    //            "and pl.rfq_no in (:rfqNos)")
     @Query(nativeQuery = true,
-           value = "select * from pr_line pl " +
-               "where pl.need_by_date = (select max(pl.need_by_date) as need_by_date from pr_line pl where pl.rfq_no in (:rfqNos)) " +
-               "and pl.rfq_no in (:rfqNos)")
-    List<PrLine> findAllByRfqNos(@Param("rfqNos") List<Long> rfqNos);
+           value = "select * from (select max(pl.need_by_date) as need_by_date, pl.rfq_no from pr_line pl group by pl.rfq_no) as A where A.rfq_no in (:rfqNos)")
+    List<RfqInterface> findAllByRfqNos(@Param("rfqNos") List<Long> rfqNos);
 }

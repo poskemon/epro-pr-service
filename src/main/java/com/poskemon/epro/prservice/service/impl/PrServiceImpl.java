@@ -8,6 +8,7 @@ import com.poskemon.epro.prservice.domain.dto.PrUpdateDTO;
 import com.poskemon.epro.prservice.domain.dto.PurchaseUnitReq;
 import com.poskemon.epro.prservice.domain.dto.PurchaseUnitRes;
 import com.poskemon.epro.prservice.domain.dto.RfqDTO;
+import com.poskemon.epro.prservice.domain.dto.RfqInterface;
 import com.poskemon.epro.prservice.domain.dto.UserDTO;
 import com.poskemon.epro.prservice.domain.entity.Item;
 import com.poskemon.epro.prservice.domain.entity.PrHeader;
@@ -261,7 +262,7 @@ public class PrServiceImpl implements PrService {
 
     @Override
     public List<RfqDTO> getNeedByDateByRfqNo(List<Long> rfqNos) {
-        List<PrLine> prLines = prLineRepository.findAllByRfqNos(rfqNos);
+        List<RfqInterface> prLines = prLineRepository.findAllByRfqNos(rfqNos);
         List<RfqDTO> rfqDTOs = prLines.stream().map(RfqDTO::new).collect(Collectors.toList());
         return rfqDTOs;
     }
