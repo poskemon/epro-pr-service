@@ -7,9 +7,9 @@ import com.poskemon.epro.prservice.domain.dto.PrRequest;
 import com.poskemon.epro.prservice.domain.dto.PrUpdateDTO;
 import com.poskemon.epro.prservice.domain.dto.PurchaseUnitReq;
 import com.poskemon.epro.prservice.domain.dto.PurchaseUnitRes;
-import com.poskemon.epro.prservice.domain.dto.RfqDTO;
-import com.poskemon.epro.prservice.domain.dto.RfqInterface;
-import com.poskemon.epro.prservice.domain.dto.UserDTO;
+import com.poskemon.epro.prservice.domain.dto.NeedByDateSearchDTO;
+import com.poskemon.epro.prservice.domain.dto.NeedByDateSearch;
+import com.poskemon.epro.prservice.domain.dto.UserInfoDTO;
 import com.poskemon.epro.prservice.domain.entity.Item;
 import com.poskemon.epro.prservice.domain.entity.PrHeader;
 import com.poskemon.epro.prservice.domain.entity.PrLine;
@@ -124,11 +124,11 @@ public class PrServiceImpl implements PrService {
         // buyer 조회
         if (!prDetailResList.isEmpty()) {
             List<Long> buyerNos = prLines.stream().map(prLine -> prLine.getBuyerNo()).collect(Collectors.toList());
-            List<UserDTO> users = webClientService.findUsersByUserNo(buyerNos);
+            List<UserInfoDTO> users = webClientService.findUsersByUserNo(buyerNos);
             if (users != null) {
                 for (PrDetailRes prDetailRes : prDetailResList) {
                     Long buyerNo = prDetailRes.getBuyerNo();
-                    for (UserDTO user : users) {
+                    for (UserInfoDTO user : users) {
                         if (user.getUserNo().equals(buyerNo)) {
                             prDetailRes.setBuyerName(user.getUserName());
                             break;
@@ -194,13 +194,13 @@ public class PrServiceImpl implements PrService {
                                                          .collect(Collectors.toList());
 
             // userService 에서 buyerName, requesterName 조회
-            List<UserDTO> buyers = webClientService.findUsersByUserNo(buyerNos);
-            List<UserDTO> requesters = webClientService.findUsersByUserNo(requesterNos);
+            List<UserInfoDTO> buyers = webClientService.findUsersByUserNo(buyerNos);
+            List<UserInfoDTO> requesters = webClientService.findUsersByUserNo(requesterNos);
 
             if (buyers != null) {
                 for (PurchaseUnitRes purchaseUnitRes : purchaseUnitResList) {
                     Long buyerNo = purchaseUnitRes.getBuyerNo();
-                    for (UserDTO buyer : buyers) {
+                    for (UserInfoDTO buyer : buyers) {
                         if (buyer.getUserNo().equals(buyerNo)) {
                             purchaseUnitRes.setBuyerName(buyer.getUserName());
                             break;
@@ -212,7 +212,7 @@ public class PrServiceImpl implements PrService {
             if (requesters != null) {
                 for (PurchaseUnitRes purchaseUnitRes : purchaseUnitResList) {
                     Long requesterNo = purchaseUnitRes.getRequesterNo();
-                    for (UserDTO requester : requesters) {
+                    for (UserInfoDTO requester : requesters) {
                         if (requester.getUserNo().equals(requesterNo)) {
                             purchaseUnitRes.setRequesterName(requester.getUserName());
                             break;
@@ -261,9 +261,9 @@ public class PrServiceImpl implements PrService {
     }
 
     @Override
-    public List<RfqDTO> getNeedByDateByRfqNo(List<Long> rfqNos) {
-        List<RfqInterface> prLines = prLineRepository.findAllByRfqNos(rfqNos);
-        List<RfqDTO> rfqDTOs = prLines.stream().map(RfqDTO::new).collect(Collectors.toList());
-        return rfqDTOs;
+    public List<NeedByDateSearchDTO> getNeedByDateByRfqNo(List<Long> rfqNos) {
+        List<NeedByDateSearch> needBydates = prLineRepository.findAllByRfqNos(rfqNos);
+        List<NeedByDateSearchDTO> needByDateSearchDTOS = needBydates.stream().map(NeedByDateSearchDTO::new).collect(Collectors.toList());
+        return needByDateSearchDTOS;
     }
 }
