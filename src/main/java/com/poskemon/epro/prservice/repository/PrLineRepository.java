@@ -1,5 +1,6 @@
 package com.poskemon.epro.prservice.repository;
 
+import com.poskemon.epro.prservice.domain.dto.PrUpdateDTO;
 import com.poskemon.epro.prservice.domain.dto.PurchaseUnitReq;
 import com.poskemon.epro.prservice.domain.entity.PrHeader;
 import com.poskemon.epro.prservice.domain.entity.PrLine;
@@ -30,4 +31,17 @@ public interface PrLineRepository extends JpaRepository<PrLine, Long> {
         "and (:#{#purchaseUnitReq.category} is null or i.category = :#{#purchaseUnitReq.category}) " +
         "and (:#{#purchaseUnitReq.rfqNo} = -1L or pl.rfqNo = :#{#purchaseUnitReq.rfqNo})")
     List<PrLine> findAllPrWithParams(@Param("purchaseUnitReq") PurchaseUnitReq purchaseUnitReq);
+
+    @Query(value = "select pl, ph " +
+        "from PrLine pl " +
+        "join pl.prHeader ph " +
+        "where (:#{#prUpdateDTO.prNo} is null or ph.prNo = :#{#prUpdateDTO.prNo}) " +
+        "and pl.prLine in (:#{#prUpdateDTO.prLines})")
+    List<PrLine> findAllByPrNoAndPrLine(@Param("PrUpdateDTO") PrUpdateDTO prUpdateDTO);
+
+    @Query(nativeQuery = true,
+           value = "select * from pr_line pl " +
+               "where pl.need_by_date = (select max(pl.need_by_date) as need_by_date from pr_line pl where pl.rfq_no in (:rfqNos)) " +
+               "and pl.rfq_no in (:rfqNos)")
+    List<PrLine> findAllByRfqNos(@Param("rfqNos") List<Long> rfqNos);
 }

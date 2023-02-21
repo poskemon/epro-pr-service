@@ -16,4 +16,5 @@ public interface PrHeaderRepository extends JpaRepository<PrHeader, Long> {
     void changeStatus(@Param("prStatus") String prStatus, @Param("prNo") String prNo);
 
     PrHeader findByPrHeaderSeq(Long prHeaderSeq);
+    PrHeader findByPrNo(String prNo);
 }

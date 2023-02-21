@@ -21,7 +21,14 @@ spring:
       hibernate:
         format_sql: true
 
-# Eureka
+  kafka:
+    consumer:
+      bootstrap-servers: 204.236.155.165:9092
+      group-id: pr-service
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+
 eureka:
   instance:
     prefer-ip-address: true

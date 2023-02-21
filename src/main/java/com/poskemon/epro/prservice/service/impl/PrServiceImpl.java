@@ -1,10 +1,13 @@
 package com.poskemon.epro.prservice.service.impl;
 
+import com.google.gson.Gson;
 import com.poskemon.epro.prservice.common.constants.PrStatus;
 import com.poskemon.epro.prservice.domain.dto.PrDetailRes;
 import com.poskemon.epro.prservice.domain.dto.PrRequest;
+import com.poskemon.epro.prservice.domain.dto.PrUpdateDTO;
 import com.poskemon.epro.prservice.domain.dto.PurchaseUnitReq;
 import com.poskemon.epro.prservice.domain.dto.PurchaseUnitRes;
+import com.poskemon.epro.prservice.domain.dto.RfqDTO;
 import com.poskemon.epro.prservice.domain.dto.UserDTO;
 import com.poskemon.epro.prservice.domain.entity.Item;
 import com.poskemon.epro.prservice.domain.entity.PrHeader;
@@ -16,6 +19,7 @@ import com.poskemon.epro.prservice.service.PrService;
 
 import com.poskemon.epro.prservice.service.WebClientService;
 
+import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -26,6 +30,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -231,5 +236,35 @@ public class PrServiceImpl implements PrService {
         }
 
         return purchaseUnitResList;
+    }
+
+    @Transactional
+    @KafkaListener(topics = "pr-update", groupId = "pr-service")
+    public void setRfqNo(String message) throws IOException {
+        System.out.println("receive message : " + message);
+
+        PrUpdateDTO prUpdateDTO = new Gson().fromJson(message, PrUpdateDTO.class);
+
+        // prLine의 rfqNo등록
+        List<PrLine> prLines = prLineRepository.findAllByPrNoAndPrLine(prUpdateDTO);
+        for (int i = 0; i < prLines.size(); i++) {
+            prLines.get(i).setRfqNo(prUpdateDTO.getRfqNo());
+        }
+        // prHeader의 진행상태 승인완료로 변경
+        // prHeader의 승인완료일 현재시각으로 등록
+        PrHeader prHeader = prHeaderRepository.findByPrNo(prUpdateDTO.getPrNo());
+        LocalDateTime localDateTime = LocalDateTime.now(); // 현재시각
+        prHeader.setPrStatus(PrStatus.APPROVED.getPrStatus());
+        prHeader.setPrApprovedDate(localDateTime);
+
+        prLineRepository.saveAll(prLines);
+        prHeaderRepository.save(prHeader);
+    }
+
+    @Override
+    public List<RfqDTO> getNeedByDateByRfqNo(List<Long> rfqNos) {
+        List<PrLine> prLines = prLineRepository.findAllByRfqNos(rfqNos);
+        List<RfqDTO> rfqDTOs = prLines.stream().map(RfqDTO::new).collect(Collectors.toList());
+        return rfqDTOs;
     }
 }

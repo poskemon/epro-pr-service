@@ -4,9 +4,11 @@ import com.poskemon.epro.prservice.domain.dto.PrDetailRes;
 import com.poskemon.epro.prservice.domain.dto.PrRequest;
 import com.poskemon.epro.prservice.domain.dto.PurchaseUnitReq;
 import com.poskemon.epro.prservice.domain.dto.PurchaseUnitRes;
+import com.poskemon.epro.prservice.domain.dto.RfqDTO;
 import com.poskemon.epro.prservice.domain.entity.PrHeader;
 import com.poskemon.epro.prservice.domain.entity.PrLine;
 
+import java.io.IOException;
 import java.util.List;
 
 public interface PrService {
@@ -23,4 +25,8 @@ public interface PrService {
     void deletePr(Long prHeaderSeq);
 
     List<PurchaseUnitRes> getAllPrWithParams(PurchaseUnitReq purchaseUnitReq);
+
+    void setRfqNo(String message) throws IOException;
+
+    List<RfqDTO> getNeedByDateByRfqNo(List<Long> rfqNos);
 }

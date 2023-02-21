@@ -170,4 +170,9 @@ public class PrController {
         }
     }
 
+    @GetMapping("/pr-line/need-by-date/{rfqNos}")
+    public List<RfqDTO> getNeedByDateByRfqNo(@PathVariable List<Long> rfqNos) {
+        return prService.getNeedByDateByRfqNo(rfqNos);
+    }
+
 }
