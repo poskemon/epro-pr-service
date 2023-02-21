@@ -19,15 +19,15 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class PrResponse<T> {
-    @JsonProperty("MESSAGE")
+    @JsonProperty("message")
     private String message;
 
-    @JsonProperty("PR_HEADER")
+    @JsonProperty("pr_header")
     private PrHeader prHeader;
 
-    @JsonProperty("PR_LINE_LIST")
+    @JsonProperty("pr_lines")
     private List<PrDetailRes> prLines;
 
-    @JsonProperty("ITEM_LIST")
+    @JsonProperty("items")
     private List<Item> itmeList;
 }

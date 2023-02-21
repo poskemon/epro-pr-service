@@ -116,15 +116,17 @@ public class PrServiceImpl implements PrService {
         List<PrDetailRes> prDetailResList = prLines.stream().map(PrDetailRes::new).collect(Collectors.toList());
 
         // buyer 조회
-        List<Long> buyerNos = prLines.stream().map(prLine -> prLine.getBuyerNo()).collect(Collectors.toList());
-        List<UserDTO> users = webClientService.findUsersByUserNo(buyerNos);
-        if (users != null) {
-            for (PrDetailRes prDetailRes : prDetailResList) {
-                Long buyerNo = prDetailRes.getBuyerNo();
-                for (UserDTO user : users) {
-                    if (user.getUserNo().equals(buyerNo)) {
-                        prDetailRes.setBuyerName(user.getUserName());
-                        break;
+        if (!prDetailResList.isEmpty()) {
+            List<Long> buyerNos = prLines.stream().map(prLine -> prLine.getBuyerNo()).collect(Collectors.toList());
+            List<UserDTO> users = webClientService.findUsersByUserNo(buyerNos);
+            if (users != null) {
+                for (PrDetailRes prDetailRes : prDetailResList) {
+                    Long buyerNo = prDetailRes.getBuyerNo();
+                    for (UserDTO user : users) {
+                        if (user.getUserNo().equals(buyerNo)) {
+                            prDetailRes.setBuyerName(user.getUserName());
+                            break;
+                        }
                     }
                 }
             }
