@@ -3,6 +3,8 @@ package com.poskemon.epro.prservice.service.impl;
 import com.poskemon.epro.prservice.common.constants.PrStatus;
 import com.poskemon.epro.prservice.domain.dto.PrDetailRes;
 import com.poskemon.epro.prservice.domain.dto.PrRequest;
+import com.poskemon.epro.prservice.domain.dto.PurchaseUnitReq;
+import com.poskemon.epro.prservice.domain.dto.PurchaseUnitRes;
 import com.poskemon.epro.prservice.domain.dto.UserDTO;
 import com.poskemon.epro.prservice.domain.entity.Item;
 import com.poskemon.epro.prservice.domain.entity.PrHeader;
@@ -14,11 +16,12 @@ import com.poskemon.epro.prservice.service.PrService;
 
 import com.poskemon.epro.prservice.service.WebClientService;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Objects;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -113,13 +116,18 @@ public class PrServiceImpl implements PrService {
         List<PrDetailRes> prDetailResList = prLines.stream().map(PrDetailRes::new).collect(Collectors.toList());
 
         // buyer 조회
-        List<Long> buyerNos = prLines.stream().map(prLine -> prLine.getBuyerNo()).collect(Collectors.toList());
-        List<UserDTO> users = webClientService.findUsersByUserNo(buyerNos);
-        if (!Objects.isNull(users)) {
-            for (int i = 0; i < prDetailResList.size(); i++) {
-                Long buyerNo = prDetailResList.get(i).getBuyerNo();
-                if (users.get(i).getUserNo().equals(buyerNo)) {
-                    prDetailResList.get(i).setBuyerName(users.get(i).getUserName());
+        if (!prDetailResList.isEmpty()) {
+            List<Long> buyerNos = prLines.stream().map(prLine -> prLine.getBuyerNo()).collect(Collectors.toList());
+            List<UserDTO> users = webClientService.findUsersByUserNo(buyerNos);
+            if (users != null) {
+                for (PrDetailRes prDetailRes : prDetailResList) {
+                    Long buyerNo = prDetailRes.getBuyerNo();
+                    for (UserDTO user : users) {
+                        if (user.getUserNo().equals(buyerNo)) {
+                            prDetailRes.setBuyerName(user.getUserName());
+                            break;
+                        }
+                    }
                 }
             }
         }
@@ -161,5 +169,65 @@ public class PrServiceImpl implements PrService {
         PrHeader prHeader = prHeaderRepository.findByPrHeaderSeq(prHeaderSeq);
         prLineRepository.deleteAllByPrHeader(prHeader);
         prHeaderRepository.deleteById(prHeaderSeq);
+    }
+
+    @Override
+    public List<PurchaseUnitRes> getAllPrWithParams(PurchaseUnitReq purchaseUnitReq) {
+        List<PrLine> prLines = prLineRepository.findAllPrWithParams(purchaseUnitReq);
+        List<PurchaseUnitRes> purchaseUnitResList = prLines.stream()
+                                                           .map(PurchaseUnitRes::new)
+                                                           .collect(Collectors.toList());
+        // 조회결과가 있을 경우 아래의 코드 실행
+        if (!purchaseUnitResList.isEmpty()) {
+            // buyerNo, requesterNo 리스트
+            List<Long> buyerNos = purchaseUnitResList.stream()
+                                                     .map(purchaseUnitRes -> purchaseUnitRes.getBuyerNo())
+                                                     .collect(Collectors.toList());
+            List<Long> requesterNos = purchaseUnitResList.stream()
+                                                         .map(purchaseUnitRes -> purchaseUnitRes.getRequesterNo())
+                                                         .collect(Collectors.toList());
+
+            // userService 에서 buyerName, requesterName 조회
+            List<UserDTO> buyers = webClientService.findUsersByUserNo(buyerNos);
+            List<UserDTO> requesters = webClientService.findUsersByUserNo(requesterNos);
+
+            if (buyers != null) {
+                for (PurchaseUnitRes purchaseUnitRes : purchaseUnitResList) {
+                    Long buyerNo = purchaseUnitRes.getBuyerNo();
+                    for (UserDTO buyer : buyers) {
+                        if (buyer.getUserNo().equals(buyerNo)) {
+                            purchaseUnitRes.setBuyerName(buyer.getUserName());
+                            break;
+                        }
+                    }
+                }
+            }
+
+            if (requesters != null) {
+                for (PurchaseUnitRes purchaseUnitRes : purchaseUnitResList) {
+                    Long requesterNo = purchaseUnitRes.getRequesterNo();
+                    for (UserDTO requester : requesters) {
+                        if (requester.getUserNo().equals(requesterNo)) {
+                            purchaseUnitRes.setRequesterName(requester.getUserName());
+                            break;
+                        }
+                    }
+                }
+            }
+
+            // set elapsedDate (현재날짜 - 승인일)
+            LocalDateTime today = LocalDateTime.now();
+            for (int i = 0; i < purchaseUnitResList.size(); i++) {
+                LocalDateTime approvedDate = prLines.get(i).getPrHeader().getPrApprovedDate();
+                if (approvedDate != null) {
+                    LocalDate todayDate = today.toLocalDate();
+                    LocalDate approvedLocalDate = approvedDate.toLocalDate();
+                    long elapsedDays = ChronoUnit.DAYS.between(approvedLocalDate, todayDate);
+                    purchaseUnitResList.get(i).setElapsedDate(elapsedDays);
+                }
+            }
+        }
+
+        return purchaseUnitResList;
     }
 }

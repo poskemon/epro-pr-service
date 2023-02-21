@@ -3,10 +3,7 @@ package com.poskemon.epro.prservice.controller;
 import com.poskemon.epro.prservice.common.constants.Message;
 import com.poskemon.epro.prservice.common.constants.PrStatus;
 import com.poskemon.epro.prservice.common.constants.UserRole;
-import com.poskemon.epro.prservice.domain.dto.PrDetailRes;
-import com.poskemon.epro.prservice.domain.dto.PrRequest;
-import com.poskemon.epro.prservice.domain.dto.PrResponse;
-import com.poskemon.epro.prservice.domain.dto.UserDTO;
+import com.poskemon.epro.prservice.domain.dto.*;
 import com.poskemon.epro.prservice.domain.entity.Item;
 import com.poskemon.epro.prservice.domain.entity.PrHeader;
 import com.poskemon.epro.prservice.service.ItemService;
@@ -153,4 +150,15 @@ public class PrController {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
+
+    @GetMapping("/pr-line")
+    public ResponseEntity<?> getPrLinesForPrUnit(PurchaseUnitReq purchaseUnitReq) {
+        try {
+            List<PurchaseUnitRes> purchaseUnitResList = prService.getAllPrWithParams(purchaseUnitReq);
+            return ResponseEntity.ok().body(purchaseUnitResList);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
 }
