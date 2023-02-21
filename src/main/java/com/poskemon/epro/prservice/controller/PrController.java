@@ -154,6 +154,15 @@ public class PrController {
     @GetMapping("/pr-line")
     public ResponseEntity<?> getPrLinesForPrUnit(PurchaseUnitReq purchaseUnitReq) {
         try {
+            if(purchaseUnitReq.getRequesterNo() == null) {
+                purchaseUnitReq.setRequesterNo(-1L);
+            }
+            if(purchaseUnitReq.getBuyerNo() == null) {
+                purchaseUnitReq.setBuyerNo(-1L);
+            }
+            if(purchaseUnitReq.getRfqNo() == null) {
+                purchaseUnitReq.setRfqNo(-1L);
+            }
             List<PurchaseUnitRes> purchaseUnitResList = prService.getAllPrWithParams(purchaseUnitReq);
             return ResponseEntity.ok().body(purchaseUnitResList);
         } catch (Exception e) {
