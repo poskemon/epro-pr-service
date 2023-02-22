@@ -1,6 +1,6 @@
 package com.poskemon.epro.prservice.service.impl;
 
-import com.poskemon.epro.prservice.domain.dto.UserDTO;
+import com.poskemon.epro.prservice.domain.dto.UserInfoDTO;
 import com.poskemon.epro.prservice.service.WebClientService;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 
@@ -33,8 +33,8 @@ public class WebClientServiceImpl implements WebClientService {
      */
     @Override
     @CircuitBreaker(name = "hello4j", fallbackMethod = "findAllFallback")
-    public List<UserDTO> findUsersByUserNo(List<Long> userNos) {
-        Mono<UserDTO[]> result = webclientFindUsersByUserNo(userNos);
+    public List<UserInfoDTO> findUsersByUserNo(List<Long> userNos) {
+        Mono<UserInfoDTO[]> result = webclientFindUsersByUserNo(userNos);
         return Arrays.stream(result.block()).collect(Collectors.toList());
     }
 
@@ -53,7 +53,7 @@ public class WebClientServiceImpl implements WebClientService {
 //                .bodyToMono(UserDTO[].class);
 //    }
 
-    private Mono<UserDTO[]> webclientFindUsersByUserNo(List<Long> userNos) {
+    private Mono<UserInfoDTO[]> webclientFindUsersByUserNo(List<Long> userNos) {
         WebClient webClient = WebClient.create();
         StringBuilder temp = new StringBuilder(userNos.get(0).toString());
         for (int i = 1; i < userNos.size(); i++) {
@@ -65,7 +65,7 @@ public class WebClientServiceImpl implements WebClientService {
                 .get()
                 .uri("http://localhost:8081/users/" + temp)
                 .retrieve()
-                .bodyToMono(UserDTO[].class);
+                .bodyToMono(UserInfoDTO[].class);
     }
 
     /**
@@ -75,18 +75,18 @@ public class WebClientServiceImpl implements WebClientService {
      */
     @Override
     @CircuitBreaker(name = "hello4j", fallbackMethod = "findAllFallback")
-    public List<UserDTO> findUsersByRole(int role) {
-        Mono<UserDTO[]> result = webclientFindUsersByRole(role);
+    public List<UserInfoDTO> findUsersByRole(int role) {
+        Mono<UserInfoDTO[]> result = webclientFindUsersByRole(role);
         return Arrays.stream(result.block()).collect(Collectors.toList());
     }
 
-    private Mono<UserDTO[]> webclientFindUsersByRole(int role) {
+    private Mono<UserInfoDTO[]> webclientFindUsersByRole(int role) {
         WebClient webClient = WebClient.create();
         return webClient
                 .get()
                 .uri("http://localhost:8081/role/" + role)
                 .retrieve()
-                .bodyToMono(UserDTO[].class);
+                .bodyToMono(UserInfoDTO[].class);
     }
 
     /**

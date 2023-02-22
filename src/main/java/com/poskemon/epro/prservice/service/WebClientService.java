@@ -1,11 +1,11 @@
 package com.poskemon.epro.prservice.service;
 
-import com.poskemon.epro.prservice.domain.dto.UserDTO;
+import com.poskemon.epro.prservice.domain.dto.UserInfoDTO;
 
 import java.util.List;
 
 public interface WebClientService {
-    List<UserDTO> findUsersByUserNo(List<Long> userNos);
+    List<UserInfoDTO> findUsersByUserNo(List<Long> userNos);
 
-    List<UserDTO> findUsersByRole(int role);
+    List<UserInfoDTO> findUsersByRole(int role);
 }

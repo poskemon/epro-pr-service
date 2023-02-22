@@ -2,6 +2,7 @@ package com.poskemon.epro.prservice.repository;
 
 import com.poskemon.epro.prservice.domain.dto.PrUpdateDTO;
 import com.poskemon.epro.prservice.domain.dto.PurchaseUnitReq;
+import com.poskemon.epro.prservice.domain.dto.NeedByDateSearch;
 import com.poskemon.epro.prservice.domain.entity.PrHeader;
 import com.poskemon.epro.prservice.domain.entity.PrLine;
 import org.apache.ibatis.annotations.Param;
@@ -27,7 +28,7 @@ public interface PrLineRepository extends JpaRepository<PrLine, Long> {
         "and (:#{#purchaseUnitReq.buyerNo} = -1L or pl.buyerNo = :#{#purchaseUnitReq.buyerNo}) " +
         "and (:#{#purchaseUnitReq.itemDescription} is null or i.itemDescription = :#{#purchaseUnitReq.itemDescription}) " +
         "and (:#{#purchaseUnitReq.spec} is null or i.spec = :#{#purchaseUnitReq.spec}) " +
-        "and (:#{#purchaseUnitReq.prStatus} is null or ph.prStatus = :#{#purchaseUnitReq.prStatus}) " +
+        "and (:#{#purchaseUnitReq.prStatus} is null or ph.prStatus = :#{#purchaseUnitReq.prStatus}) and ph.prStatus != :#{#purchaseUnitReq.except} " +
         "and (:#{#purchaseUnitReq.category} is null or i.category = :#{#purchaseUnitReq.category}) " +
         "and (:#{#purchaseUnitReq.rfqNo} = -1L or pl.rfqNo = :#{#purchaseUnitReq.rfqNo})")
     List<PrLine> findAllPrWithParams(@Param("purchaseUnitReq") PurchaseUnitReq purchaseUnitReq);
@@ -40,8 +41,6 @@ public interface PrLineRepository extends JpaRepository<PrLine, Long> {
     List<PrLine> findAllByPrNoAndPrLine(@Param("PrUpdateDTO") PrUpdateDTO prUpdateDTO);
 
     @Query(nativeQuery = true,
-           value = "select * from pr_line pl " +
-               "where pl.need_by_date = (select max(pl.need_by_date) as need_by_date from pr_line pl where pl.rfq_no in (:rfqNos)) " +
-               "and pl.rfq_no in (:rfqNos)")
-    List<PrLine> findAllByRfqNos(@Param("rfqNos") List<Long> rfqNos);
+           value = "select * from (select max(pl.need_by_date) as needByDate, pl.rfq_no as rfqNo from pr_line pl group by pl.rfq_no) as A where A.rfqNo in (:rfqNos)")
+    List<NeedByDateSearch> findAllByRfqNos(@Param("rfqNos") List<Long> rfqNos);
 }

@@ -47,8 +47,8 @@ public class PrController {
      * @return 바이어 리스트
      */
     @GetMapping("/buyers")
-    public List<UserDTO> findAllBuyers() {
-        List<UserDTO> users = webClientService.findUsersByRole(UserRole.BUYER.getCode());
+    public List<UserInfoDTO> findAllBuyers() {
+        List<UserInfoDTO> users = webClientService.findUsersByRole(UserRole.BUYER.getCode());
         return users;
     }
 
@@ -154,6 +154,9 @@ public class PrController {
     @GetMapping("/pr-line")
     public ResponseEntity<?> getPrLinesForPrUnit(PurchaseUnitReq purchaseUnitReq) {
         try {
+            if(purchaseUnitReq.getExcept() == null) {
+                purchaseUnitReq.setExcept(PrStatus.ENROLLED.getPrStatus());
+            }
             if(purchaseUnitReq.getRequesterNo() == null) {
                 purchaseUnitReq.setRequesterNo(-1L);
             }
@@ -171,7 +174,7 @@ public class PrController {
     }
 
     @GetMapping("/pr-line/need-by-date/{rfqNos}")
-    public List<RfqDTO> getNeedByDateByRfqNo(@PathVariable List<Long> rfqNos) {
+    public List<NeedByDateSearchDTO> getNeedByDateByRfqNo(@PathVariable List<Long> rfqNos) {
         return prService.getNeedByDateByRfqNo(rfqNos);
     }
 
