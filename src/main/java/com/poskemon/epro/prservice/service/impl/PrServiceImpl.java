@@ -2,13 +2,13 @@ package com.poskemon.epro.prservice.service.impl;
 
 import com.google.gson.Gson;
 import com.poskemon.epro.prservice.common.constants.PrStatus;
+import com.poskemon.epro.prservice.domain.dto.NeedByDateSearch;
+import com.poskemon.epro.prservice.domain.dto.NeedByDateSearchDTO;
 import com.poskemon.epro.prservice.domain.dto.PrDetailRes;
 import com.poskemon.epro.prservice.domain.dto.PrRequest;
 import com.poskemon.epro.prservice.domain.dto.PrUpdateDTO;
 import com.poskemon.epro.prservice.domain.dto.PurchaseUnitReq;
 import com.poskemon.epro.prservice.domain.dto.PurchaseUnitRes;
-import com.poskemon.epro.prservice.domain.dto.NeedByDateSearchDTO;
-import com.poskemon.epro.prservice.domain.dto.NeedByDateSearch;
 import com.poskemon.epro.prservice.domain.dto.UserInfoDTO;
 import com.poskemon.epro.prservice.domain.entity.Item;
 import com.poskemon.epro.prservice.domain.entity.PrHeader;
@@ -17,9 +17,7 @@ import com.poskemon.epro.prservice.repository.ItemRepository;
 import com.poskemon.epro.prservice.repository.PrHeaderRepository;
 import com.poskemon.epro.prservice.repository.PrLineRepository;
 import com.poskemon.epro.prservice.service.PrService;
-
 import com.poskemon.epro.prservice.service.WebClientService;
-
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -29,7 +27,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
-
 import lombok.RequiredArgsConstructor;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
@@ -263,7 +260,14 @@ public class PrServiceImpl implements PrService {
     @Override
     public List<NeedByDateSearchDTO> getNeedByDateByRfqNo(List<Long> rfqNos) {
         List<NeedByDateSearch> needBydates = prLineRepository.findAllByRfqNos(rfqNos);
-        List<NeedByDateSearchDTO> needByDateSearchDTOS = needBydates.stream().map(NeedByDateSearchDTO::new).collect(Collectors.toList());
+        List<NeedByDateSearchDTO> needByDateSearchDTOS = needBydates.stream()
+                                                                    .map(NeedByDateSearchDTO::new)
+                                                                    .collect(Collectors.toList());
         return needByDateSearchDTOS;
+    }
+
+    @Override
+    public List<Long> retrieveItemInfoByRfqNo(List<Long> rfqNos) {
+        return prLineRepository.findItemNoByRfqNo(rfqNos);
     }
 }
