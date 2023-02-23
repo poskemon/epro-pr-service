@@ -1,5 +1,6 @@
 package com.poskemon.epro.prservice.service.impl;
 
+import com.poskemon.epro.prservice.domain.dto.PoInfo;
 import com.poskemon.epro.prservice.domain.dto.UserInfoDTO;
 import com.poskemon.epro.prservice.service.WebClientService;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
@@ -28,6 +29,7 @@ public class WebClientServiceImpl implements WebClientService {
 
     /**
      * 사용자 번호로 조회
+     *
      * @param userNos 조회하려는 사용자 번호 리스트
      * @return 조회된 사용자 리스트
      */
@@ -62,14 +64,15 @@ public class WebClientServiceImpl implements WebClientService {
         log.info(temp.toString());
 
         return webClient
-                .get()
-                .uri("http://localhost:8081/users/" + temp)
-                .retrieve()
-                .bodyToMono(UserInfoDTO[].class);
+            .get()
+            .uri("http://localhost:8081/users/" + temp)
+            .retrieve()
+            .bodyToMono(UserInfoDTO[].class);
     }
 
     /**
      * 권한별 조회
+     *
      * @param role 사용부서(1), 바이어(2), 공급사(3), 슈퍼바이어(4)
      * @return 조회된 사용자 리스트
      */
@@ -83,14 +86,41 @@ public class WebClientServiceImpl implements WebClientService {
     private Mono<UserInfoDTO[]> webclientFindUsersByRole(int role) {
         WebClient webClient = WebClient.create();
         return webClient
-                .get()
-                .uri("http://localhost:8081/role/" + role)
-                .retrieve()
-                .bodyToMono(UserInfoDTO[].class);
+            .get()
+            .uri("http://localhost:8081/role/" + role)
+            .retrieve()
+            .bodyToMono(UserInfoDTO[].class);
+    }
+
+    /**
+     * rfqNo로 poNo, poPrice 조회
+     *
+     * @param rfqNos rfqNo 리스트
+     * @return 조회된 poInfo 리스트
+     */
+    @Override
+    @CircuitBreaker(name = "hello4j", fallbackMethod = "findAllFallback")
+    public List<PoInfo> getPoInfoByRfqNo(List<Long> rfqNos) {
+        Mono<PoInfo[]> result = webclientGetPoInfoByRfqNo(rfqNos);
+        return Arrays.stream(result.block()).collect(Collectors.toList());
+    }
+
+    private Mono<PoInfo[]> webclientGetPoInfoByRfqNo(List<Long> rfqNos) {
+        WebClient webClient = WebClient.create();
+        StringBuilder temp = new StringBuilder(rfqNos.get(0).toString());
+        for (int i = 1; i < rfqNos.size(); i++) {
+            temp.append(",").append(rfqNos.get(i));
+        }
+        return webClient
+            .get()
+            .uri("http://localhost:8081/po/" + temp)
+            .retrieve()
+            .bodyToMono(PoInfo[].class);
     }
 
     /**
      * 다른 서비스 장애 발생시 실행되는 fallback 메소드
+     *
      * @param e error
      * @return null
      */

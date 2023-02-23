@@ -8,6 +8,8 @@ import com.poskemon.epro.prservice.domain.dto.PrDetailRes;
 import com.poskemon.epro.prservice.domain.dto.PrHeaderInfo;
 import com.poskemon.epro.prservice.domain.dto.PrRequest;
 import com.poskemon.epro.prservice.domain.dto.PrResponse;
+import com.poskemon.epro.prservice.domain.dto.PrRetrieveReq;
+import com.poskemon.epro.prservice.domain.dto.PrRetrieveRes;
 import com.poskemon.epro.prservice.domain.dto.PurchaseUnitReq;
 import com.poskemon.epro.prservice.domain.dto.PurchaseUnitRes;
 import com.poskemon.epro.prservice.domain.dto.UserInfoDTO;
@@ -17,6 +19,7 @@ import com.poskemon.epro.prservice.service.ItemService;
 import com.poskemon.epro.prservice.service.PrService;
 import com.poskemon.epro.prservice.service.WebClientService;
 import java.util.List;
+import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -127,6 +130,8 @@ public class PrController {
         }
     }
 
+    // TODO - PrLineSeq로 상세조회 API
+
     /**
      * 구매신청 수정
      * 등록완료 상태에서만 수정 가능함.
@@ -197,6 +202,23 @@ public class PrController {
             }
             List<PurchaseUnitRes> purchaseUnitResList = prService.getAllPrWithParams(purchaseUnitReq);
             return ResponseEntity.ok().body(purchaseUnitResList);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    /**
+     * PR 목록 조회
+     * 구매신청현황 화면에서 사용
+     *
+     * @param prRetrieveReq 구매신청현황 조회 조건
+     * @return 조회된 PR 목록
+     */
+    @GetMapping("/pr/search")
+    public ResponseEntity<?> getPrLines(PrRetrieveReq prRetrieveReq) {
+        try {
+            List<PrRetrieveRes> prRetrieveResList = prService.getAllPr(prRetrieveReq);
+            return ResponseEntity.ok().body(prRetrieveResList);
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
