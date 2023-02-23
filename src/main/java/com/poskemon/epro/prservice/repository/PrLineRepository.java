@@ -1,19 +1,19 @@
 package com.poskemon.epro.prservice.repository;
 
+import com.poskemon.epro.prservice.domain.dto.NeedByDateSearch;
 import com.poskemon.epro.prservice.domain.dto.PrUpdateDTO;
 import com.poskemon.epro.prservice.domain.dto.PurchaseUnitReq;
-import com.poskemon.epro.prservice.domain.dto.NeedByDateSearch;
 import com.poskemon.epro.prservice.domain.entity.PrHeader;
 import com.poskemon.epro.prservice.domain.entity.PrLine;
+import java.util.List;
+import java.util.Optional;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
-
 @Repository
-public interface PrLineRepository extends JpaRepository<PrLine, Long> {
+public interface PrLineRepository extends JpaRepository<PrLine, Long>, PrLineRepositoryCustom {
     List<PrLine> findAllByPrHeader(PrHeader prHeader);
 
     void deleteAllByPrHeader(PrHeader prHeader);
@@ -43,4 +43,10 @@ public interface PrLineRepository extends JpaRepository<PrLine, Long> {
     @Query(nativeQuery = true,
            value = "select * from (select max(pl.need_by_date) as needByDate, pl.rfq_no as rfqNo from pr_line pl group by pl.rfq_no) as A where A.rfqNo in (:rfqNos)")
     List<NeedByDateSearch> findAllByRfqNos(@Param("rfqNos") List<Long> rfqNos);
+
+    @Query(value = "select distinct p.item.itemNo from PrLine p where p.rfqNo in (:rfqNos)")
+    List<Long> findItemNoByRfqNo(List<Long> rfqNos);
+
+
+    List<PrLine> findPrLinesByRfqNo(Long rfqNo);
 }
