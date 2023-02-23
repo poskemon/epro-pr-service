@@ -173,6 +173,13 @@ public class PrController {
         }
     }
 
+    /**
+     * PR 목록 조회
+     * 구매단위편성 화면에서 사용
+     *
+     * @param purchaseUnitReq 구매단위편성 조회 조건
+     * @return 조회된 PR 목록
+     */
     @GetMapping("/pr-line")
     public ResponseEntity<?> getPrLinesForPrUnit(PurchaseUnitReq purchaseUnitReq) {
         try {
@@ -195,6 +202,13 @@ public class PrController {
         }
     }
 
+    /**
+     * 최대 납기일 조회
+     * rfqNo에 해당하는 PrLine 목록 중 최대 납기일 조회
+     *
+     * @param rfqNos rfqNo 리스트
+     * @return rfqNo, NeedByDate 리스트
+     */
     @GetMapping("/pr-line/need-by-date/{rfqNos}")
     public List<NeedByDateSearchDTO> getNeedByDateByRfqNo(@PathVariable List<Long> rfqNos) {
         return prService.getNeedByDateByRfqNo(rfqNos);

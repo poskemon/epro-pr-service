@@ -27,7 +27,6 @@ import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -177,6 +176,13 @@ public class PrServiceImpl implements PrService {
         prHeaderRepository.deleteById(prHeaderSeq);
     }
 
+    /**
+     * PR 목록 조회
+     * 구매단위편성 화면에서 사용
+     *
+     * @param purchaseUnitReq 구매단위편성 조회 조건
+     * @return 조회된 PR 목록
+     */
     @Override
     public List<PurchaseUnitRes> getAllPrWithParams(PurchaseUnitReq purchaseUnitReq) {
         List<PrLine> prLines = prLineRepository.findAllPrWithParams(purchaseUnitReq);
@@ -237,6 +243,13 @@ public class PrServiceImpl implements PrService {
         return purchaseUnitResList;
     }
 
+    /**
+     * RfqNo 생성
+     * kafka를 통해 데이터 동기화
+     *
+     * @param message kafka에게 받은 문자열 데이터
+     * @throws IOException
+     */
     @Transactional
     @KafkaListener(topics = "pr-update", groupId = "pr-service")
     public void setRfqNo(String message) throws IOException {
@@ -262,6 +275,13 @@ public class PrServiceImpl implements PrService {
         // prHeaderRepository.save(prHeader);
     }
 
+    /**
+     * 최대 납기일 조회
+     * rfqNo에 해당하는 PrLine 목록 중 최대 납기일 조회
+     *
+     * @param rfqNos rfqNo 리스트
+     * @return rfqNo, NeedByDate 리스트
+     */
     @Override
     public List<NeedByDateSearchDTO> getNeedByDateByRfqNo(List<Long> rfqNos) {
         List<NeedByDateSearch> needBydates = prLineRepository.findAllByRfqNos(rfqNos);
