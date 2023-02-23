@@ -5,6 +5,7 @@ import com.poskemon.epro.prservice.common.constants.PrStatus;
 import com.poskemon.epro.prservice.common.constants.UserRole;
 import com.poskemon.epro.prservice.domain.dto.NeedByDateSearchDTO;
 import com.poskemon.epro.prservice.domain.dto.PrDetailRes;
+import com.poskemon.epro.prservice.domain.dto.PrHeaderInfo;
 import com.poskemon.epro.prservice.domain.dto.PrRequest;
 import com.poskemon.epro.prservice.domain.dto.PrResponse;
 import com.poskemon.epro.prservice.domain.dto.PurchaseUnitReq;
@@ -198,6 +199,18 @@ public class PrController {
     @PostMapping("/item-info")
     public List<Long> retrieveItemInfoByRfqNo(@RequestBody List<Long> rfqNos) {
         return prService.retrieveItemInfoByRfqNo(rfqNos);
+    }
+
+    /**
+     * RfqNo 로 해당하는 PR 정보를 모두 조회
+     * 낙찰된 RFQ 정보를 조회할 때 사용
+     *
+     * @param rfqNo 조회할 rfq 번호
+     * @return rfq 번호로 해당하는 PR 모두 조회
+     */
+    @GetMapping("/pr-line/{rfqNo}")
+    public List<PrHeaderInfo> retrievePrInfoByRfqNo(@PathVariable Long rfqNo) {
+        return prService.retrievePrInfoByRfqNo(rfqNo);
     }
 
 }

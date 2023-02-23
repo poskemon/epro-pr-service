@@ -1,10 +1,10 @@
 package com.poskemon.epro.prservice.domain.dto;
 
 import com.poskemon.epro.prservice.domain.entity.PrLine;
-
-import com.poskemon.epro.prservice.domain.entity.Item;
 import java.time.LocalDate;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
  * 구매단위편성 조회 결과
@@ -18,6 +18,7 @@ public class PurchaseUnitRes {
     private Long elapsedDate; // 현재날짜 - 승인날짜
     private String category;
     private String itemDescription;
+    private Long itemNo;
     private String spec;
     private String uom;
     private String prNo;
@@ -37,6 +38,7 @@ public class PurchaseUnitRes {
         this.rfqNo = prLine.getRfqNo();
         this.category = prLine.getItem().getCategory();
         this.itemDescription = prLine.getItem().getItemDescription();
+        this.itemNo = prLine.getItem().getItemNo();
         this.spec = prLine.getItem().getSpec();
         this.uom = prLine.getItem().getUom();
         this.prNo = prLine.getPrHeader().getPrNo();

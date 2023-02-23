@@ -5,6 +5,7 @@ import com.poskemon.epro.prservice.common.constants.PrStatus;
 import com.poskemon.epro.prservice.domain.dto.NeedByDateSearch;
 import com.poskemon.epro.prservice.domain.dto.NeedByDateSearchDTO;
 import com.poskemon.epro.prservice.domain.dto.PrDetailRes;
+import com.poskemon.epro.prservice.domain.dto.PrHeaderInfo;
 import com.poskemon.epro.prservice.domain.dto.PrRequest;
 import com.poskemon.epro.prservice.domain.dto.PrUpdateDTO;
 import com.poskemon.epro.prservice.domain.dto.PurchaseUnitReq;
@@ -13,6 +14,7 @@ import com.poskemon.epro.prservice.domain.dto.UserInfoDTO;
 import com.poskemon.epro.prservice.domain.entity.Item;
 import com.poskemon.epro.prservice.domain.entity.PrHeader;
 import com.poskemon.epro.prservice.domain.entity.PrLine;
+import com.poskemon.epro.prservice.exception.PrLineException;
 import com.poskemon.epro.prservice.repository.ItemRepository;
 import com.poskemon.epro.prservice.repository.PrHeaderRepository;
 import com.poskemon.epro.prservice.repository.PrLineRepository;
@@ -25,6 +27,7 @@ import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -266,8 +269,20 @@ public class PrServiceImpl implements PrService {
         return needByDateSearchDTOS;
     }
 
+    @Transactional(readOnly = true)
     @Override
     public List<Long> retrieveItemInfoByRfqNo(List<Long> rfqNos) {
         return prLineRepository.findItemNoByRfqNo(rfqNos);
+    }
+
+    @Transactional(readOnly = true)
+    @Override
+    public List<PrHeaderInfo> retrievePrInfoByRfqNo(Long rfqNo) {
+        if (prLineRepository.findPrLinesByRfqNo(rfqNo).isEmpty()) {
+            throw new PrLineException();
+        } else {
+            PrLine prLine = prLineRepository.findPrLinesByRfqNo(rfqNo).get(0);
+            return prLineRepository.findPrInfo(prLine.getPrHeader().getPrHeaderSeq());
+        }
     }
 }
