@@ -25,6 +25,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -41,13 +42,23 @@ public class PrController {
      *
      * @return 아이템 리스트
      */
-    @GetMapping("/items")
+    @GetMapping("/items/all")
     public PrResponse findAllItems() {
         List<Item> foundItems = itemService.findAllItems();
         if (foundItems.isEmpty()) {
             return PrResponse.builder().message(Message.NOT_FOUND_ITEMS.getMessage()).build();
         }
         return PrResponse.builder().itmeList(foundItems).build();
+    }
+
+    /**
+     * 아이템 명으로 전체 조회
+     * @param itemDescription 아이템 명
+     * @return 아이템 리스트
+     */
+    @GetMapping("/items")
+    public List<Item> findItemsByDesc(@RequestParam String itemDescription) {
+        return itemService.findItemsByDesc(itemDescription);
     }
 
     /**
