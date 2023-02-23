@@ -44,7 +44,7 @@ public interface PrLineRepository extends JpaRepository<PrLine, Long>, PrLineRep
         "and (:#{#prRetrieveReq.buyerNo} = -1L or pl.buyerNo = :#{#prRetrieveReq.buyerNo}) " +
         "and (:#{#prRetrieveReq.prCreationDate} is null or ph.prCreationDate = :#{#prRetrieveReq.prCreationDate}) " +
         "and (:#{#prRetrieveReq.prStatus} is null or ph.prStatus = :#{#prRetrieveReq.prStatus}) " +
-        "order by ph.prCreationDate asc")
+        "order by ph.prCreationDate desc")
     List<PrLine> findAllPr(@Param("prRetrieveReq") PrRetrieveReq prRetrieveReq);
 
     @Query(value = "select pl, ph " +
