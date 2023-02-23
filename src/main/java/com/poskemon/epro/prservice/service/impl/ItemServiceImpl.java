@@ -24,4 +24,9 @@ public class ItemServiceImpl implements ItemService {
     public List<Item> findAllItems() {
         return itemRepository.findAll();
     }
+
+    @Override
+    public List<Item> findItemsByDesc(String itemDescription) {
+        return itemRepository.findAllByItemDescription(itemDescription);
+    }
 }
