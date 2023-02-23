@@ -249,15 +249,17 @@ public class PrServiceImpl implements PrService {
         for (int i = 0; i < prLines.size(); i++) {
             prLines.get(i).setRfqNo(prUpdateDTO.getRfqNo());
         }
+
+        // TODO - 관리자가 승인할 때 승인완료 상태로 변경
         // prHeader의 진행상태 승인완료로 변경
         // prHeader의 승인완료일 현재시각으로 등록
-        PrHeader prHeader = prHeaderRepository.findByPrNo(prUpdateDTO.getPrNo());
-        LocalDateTime localDateTime = LocalDateTime.now(); // 현재시각
-        prHeader.setPrStatus(PrStatus.APPROVED.getPrStatus());
-        prHeader.setPrApprovedDate(localDateTime);
+        // PrHeader prHeader = prHeaderRepository.findByPrNo(prUpdateDTO.getPrNo());
+        // LocalDateTime localDateTime = LocalDateTime.now(); // 현재시각
+        // prHeader.setPrStatus(PrStatus.APPROVED.getPrStatus());
+        // prHeader.setPrApprovedDate(localDateTime);
 
         prLineRepository.saveAll(prLines);
-        prHeaderRepository.save(prHeader);
+        // prHeaderRepository.save(prHeader);
     }
 
     @Override
