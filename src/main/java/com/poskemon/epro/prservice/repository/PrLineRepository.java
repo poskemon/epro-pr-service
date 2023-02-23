@@ -6,13 +6,14 @@ import com.poskemon.epro.prservice.domain.dto.PurchaseUnitReq;
 import com.poskemon.epro.prservice.domain.entity.PrHeader;
 import com.poskemon.epro.prservice.domain.entity.PrLine;
 import java.util.List;
+import java.util.Optional;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface PrLineRepository extends JpaRepository<PrLine, Long> {
+public interface PrLineRepository extends JpaRepository<PrLine, Long>, PrLineRepositoryCustom {
     List<PrLine> findAllByPrHeader(PrHeader prHeader);
 
     void deleteAllByPrHeader(PrHeader prHeader);
@@ -45,4 +46,7 @@ public interface PrLineRepository extends JpaRepository<PrLine, Long> {
 
     @Query(value = "select distinct p.item.itemNo from PrLine p where p.rfqNo in (:rfqNos)")
     List<Long> findItemNoByRfqNo(List<Long> rfqNos);
+
+
+    List<PrLine> findPrLinesByRfqNo(Long rfqNo);
 }
