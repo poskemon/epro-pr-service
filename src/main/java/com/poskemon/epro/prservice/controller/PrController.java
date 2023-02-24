@@ -132,8 +132,6 @@ public class PrController {
         }
     }
 
-    // TODO - PrLineSeq로 상세조회 API
-
     /**
      * 구매신청 수정
      * 등록완료 상태에서만 수정 가능함.
