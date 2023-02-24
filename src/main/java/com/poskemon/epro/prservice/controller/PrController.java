@@ -18,9 +18,13 @@ import com.poskemon.epro.prservice.domain.entity.PrHeader;
 import com.poskemon.epro.prservice.service.ItemService;
 import com.poskemon.epro.prservice.service.PrService;
 import com.poskemon.epro.prservice.service.WebClientService;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -31,6 +35,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+@Slf4j
 @RestController
 @RequiredArgsConstructor
 public class PrController {
@@ -45,22 +50,19 @@ public class PrController {
      *
      * @return 아이템 리스트
      */
-    @GetMapping("/items/all")
-    public PrResponse findAllItems() {
-        List<Item> foundItems = itemService.findAllItems();
-        if (foundItems.isEmpty()) {
-            return PrResponse.builder().message(Message.NOT_FOUND_ITEMS.getMessage()).build();
-        }
-        return PrResponse.builder().itmeList(foundItems).build();
+    @GetMapping("/items")
+    public List<Item> findAllItems() {
+        return itemService.findAllItems();
     }
 
     /**
      * 아이템 명으로 전체 조회
+     *
      * @param itemDescription 아이템 명
      * @return 아이템 리스트
      */
-    @GetMapping("/items")
-    public List<Item> findItemsByDesc(@RequestParam String itemDescription) {
+    @GetMapping("/items/search")
+    public List<Item> findItemsByDesc(@RequestParam(required = false) String itemDescription) {
         return itemService.findItemsByDesc(itemDescription);
     }
 
@@ -217,9 +219,33 @@ public class PrController {
     @GetMapping("/pr/search")
     public ResponseEntity<?> getPrLines(PrRetrieveReq prRetrieveReq) {
         try {
+            if (prRetrieveReq.getRequesterNo() == null) {
+                prRetrieveReq.setRequesterNo(-1L);
+            }
+            if (prRetrieveReq.getBuyerNo() == null) {
+                prRetrieveReq.setBuyerNo(-1L);
+            }
+            if (prRetrieveReq.getItemNo() == null) {
+                prRetrieveReq.setItemNo(-1L);
+            }
+            if (prRetrieveReq.getPrStatus() == null || prRetrieveReq.getPrStatus().isEmpty()) {
+                List<String> prStatusList = Arrays.asList(PrStatus.APPROVED.getPrStatus(), PrStatus.ENROLLED.getPrStatus(), PrStatus.REQUEST.getPrStatus());
+                prRetrieveReq.setPrStatus(prStatusList);
+            }
+            if (prRetrieveReq.getPrCreationDate() != null) {
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+
+                LocalDateTime searchStartTime = LocalDate.parse(prRetrieveReq.getPrCreationDate(), formatter).atStartOfDay();
+                prRetrieveReq.setPrCreationDateStart(searchStartTime);
+
+                LocalDateTime searchEndTime = searchStartTime.plusDays(1); // 1일 후
+                prRetrieveReq.setPrCreationDateEnd(searchEndTime);
+            }
+
             List<PrRetrieveRes> prRetrieveResList = prService.getAllPr(prRetrieveReq);
             return ResponseEntity.ok().body(prRetrieveResList);
         } catch (Exception e) {
+            log.error(e.getMessage());
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }

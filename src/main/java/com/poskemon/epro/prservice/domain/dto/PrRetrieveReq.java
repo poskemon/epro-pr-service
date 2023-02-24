@@ -1,6 +1,7 @@
 package com.poskemon.epro.prservice.domain.dto;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -18,5 +19,7 @@ public class PrRetrieveReq {
     private Long RequesterNo;
     private Long buyerNo;
     private String prCreationDate;
-    private String prStatus;
+    private LocalDateTime prCreationDateStart;
+    private LocalDateTime prCreationDateEnd;
+    private List<String> prStatus;
 }

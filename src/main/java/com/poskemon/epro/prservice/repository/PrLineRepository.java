@@ -37,13 +37,13 @@ public interface PrLineRepository extends JpaRepository<PrLine, Long>, PrLineRep
         "from PrLine pl " +
         "join pl.prHeader ph " +
         "join pl.item i " +
-        "where (:#{#prRetrieveReq.prNo} is null or ph.prNo = :#{#prRetrieveReq.prNo}) " +
-        "and (:#{#prRetrieveReq.prTitle} is null or ph.prTitle = :#{#prRetrieveReq.prTitle}) " +
+        "where (:#{#prRetrieveReq.prNo} is null or ph.prNo like %:#{#prRetrieveReq.prNo}%) " +
+        "and (:#{#prRetrieveReq.prTitle} is null or ph.prTitle like %:#{#prRetrieveReq.prTitle}%) " +
         "and (:#{#prRetrieveReq.itemNo} = -1L or i.itemNo = :#{#prRetrieveReq.itemNo}) " +
         "and (:#{#prRetrieveReq.requesterNo} = -1L or ph.requesterNo = :#{#prRetrieveReq.requesterNo}) " +
         "and (:#{#prRetrieveReq.buyerNo} = -1L or pl.buyerNo = :#{#prRetrieveReq.buyerNo}) " +
-        "and (:#{#prRetrieveReq.prCreationDate} is null or ph.prCreationDate = :#{#prRetrieveReq.prCreationDate}) " +
-        "and (:#{#prRetrieveReq.prStatus} is null or ph.prStatus = :#{#prRetrieveReq.prStatus}) " +
+        "and (:#{#prRetrieveReq.prCreationDate} = null or ph.prCreationDate >= :#{#prRetrieveReq.prCreationDateStart} and ph.prCreationDate < :#{#prRetrieveReq.prCreationDateEnd}) " +
+        "and ph.prStatus in (:#{#prRetrieveReq.prStatus}) " +
         "order by ph.prCreationDate desc")
     List<PrLine> findAllPr(@Param("prRetrieveReq") PrRetrieveReq prRetrieveReq);
 
