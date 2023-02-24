@@ -4,9 +4,12 @@ import com.google.gson.Gson;
 import com.poskemon.epro.prservice.common.constants.PrStatus;
 import com.poskemon.epro.prservice.domain.dto.NeedByDateSearch;
 import com.poskemon.epro.prservice.domain.dto.NeedByDateSearchDTO;
+import com.poskemon.epro.prservice.domain.dto.PoInfo;
 import com.poskemon.epro.prservice.domain.dto.PrDetailRes;
 import com.poskemon.epro.prservice.domain.dto.PrHeaderInfo;
 import com.poskemon.epro.prservice.domain.dto.PrRequest;
+import com.poskemon.epro.prservice.domain.dto.PrRetrieveReq;
+import com.poskemon.epro.prservice.domain.dto.PrRetrieveRes;
 import com.poskemon.epro.prservice.domain.dto.PrUpdateDTO;
 import com.poskemon.epro.prservice.domain.dto.PurchaseUnitReq;
 import com.poskemon.epro.prservice.domain.dto.PurchaseUnitRes;
@@ -27,7 +30,7 @@ import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Optional;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -177,6 +180,13 @@ public class PrServiceImpl implements PrService {
         prHeaderRepository.deleteById(prHeaderSeq);
     }
 
+    /**
+     * PR 목록 조회
+     * 구매단위편성 화면에서 사용
+     *
+     * @param purchaseUnitReq 구매단위편성 조회 조건
+     * @return 조회된 PR 목록
+     */
     @Override
     public List<PurchaseUnitRes> getAllPrWithParams(PurchaseUnitReq purchaseUnitReq) {
         List<PrLine> prLines = prLineRepository.findAllPrWithParams(purchaseUnitReq);
@@ -237,6 +247,87 @@ public class PrServiceImpl implements PrService {
         return purchaseUnitResList;
     }
 
+    /**
+     * PR 목록 조회
+     * 구매신청현황 화면에서 사용
+     *
+     * @param prRetrieveReq 구매신청현황 조회 조건
+     * @return 조회된 PR목록
+     */
+    @Override
+    public List<PrRetrieveRes> getAllPr(PrRetrieveReq prRetrieveReq) {
+        List<PrLine> prLines = prLineRepository.findAllPr(prRetrieveReq);
+        List<PrRetrieveRes> prRetrieveResList = prLines.stream()
+                                                       .map(PrRetrieveRes::new)
+                                                       .collect(Collectors.toList());
+
+        // 조회결과가 있을 경우 아래의 코드 실행
+        if (!prRetrieveResList.isEmpty()) {
+            // buyerNo, requesterNo, rfqNo 리스트
+            List<Long> buyerNos = prRetrieveResList.stream()
+                                                   .map(prRetrieveRes -> prRetrieveRes.getBuyerNo())
+                                                   .collect(Collectors.toList());
+            List<Long> requesterNos = prRetrieveResList.stream()
+                                                       .map(prRetrieveRes -> prRetrieveRes.getRequesterNo())
+                                                       .collect(Collectors.toList());
+            List<Long> rfqNos = prRetrieveResList.stream()
+                                                 .map(prRetrieveRes -> prRetrieveRes.getRfqNo())
+                                                 .collect(Collectors.toList());
+            rfqNos.removeIf(Objects::isNull); // rfqNo null 값 제거
+
+            // userService 에서 buyerName, requesterName 조회
+            List<UserInfoDTO> buyers = webClientService.findUsersByUserNo(buyerNos);
+            List<UserInfoDTO> requesters = webClientService.findUsersByUserNo(requesterNos);
+            // poService 에서 poNo, price 조회
+            List<PoInfo> poInfos = webClientService.getPoInfoByRfqNo(rfqNos);
+
+            if (buyers != null) {
+                for (PrRetrieveRes prRetrieveRes : prRetrieveResList) {
+                    Long buyerNo = prRetrieveRes.getBuyerNo();
+                    for (UserInfoDTO buyer : buyers) {
+                        if (buyer.getUserNo().equals(buyerNo)) {
+                            prRetrieveRes.setBuyerName(buyer.getUserName());
+                            break;
+                        }
+                    }
+                }
+            }
+
+            if (requesters != null) {
+                for (PrRetrieveRes prRetrieveRes : prRetrieveResList) {
+                    Long requesterNo = prRetrieveRes.getRequesterNo();
+                    for (UserInfoDTO requester : requesters) {
+                        if (requester.getUserNo().equals(requesterNo)) {
+                            prRetrieveRes.setRequesterName(requester.getUserName());
+                            break;
+                        }
+                    }
+                }
+            }
+
+            if (poInfos != null) {
+                for (PrRetrieveRes prRetrieveRes : prRetrieveResList) {
+                    Long rfqNo = prRetrieveRes.getRfqNo();
+                    for (PoInfo poInfo : poInfos) {
+                        if (poInfo.getRfqNo().equals(rfqNo)) {
+                            prRetrieveRes.setPoNo(poInfo.getPoNo());
+                            prRetrieveRes.setPoPrice(poInfo.getPoPrice());
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+        return prRetrieveResList;
+    }
+
+    /**
+     * RfqNo 생성
+     * kafka를 통해 데이터 동기화
+     *
+     * @param message kafka에게 받은 문자열 데이터
+     * @throws IOException
+     */
     @Transactional
     @KafkaListener(topics = "pr-update", groupId = "pr-service")
     public void setRfqNo(String message) throws IOException {
@@ -262,6 +353,13 @@ public class PrServiceImpl implements PrService {
         // prHeaderRepository.save(prHeader);
     }
 
+    /**
+     * 최대 납기일 조회
+     * rfqNo에 해당하는 PrLine 목록 중 최대 납기일 조회
+     *
+     * @param rfqNos rfqNo 리스트
+     * @return rfqNo, NeedByDate 리스트
+     */
     @Override
     public List<NeedByDateSearchDTO> getNeedByDateByRfqNo(List<Long> rfqNos) {
         List<NeedByDateSearch> needBydates = prLineRepository.findAllByRfqNos(rfqNos);

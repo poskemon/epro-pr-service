@@ -8,6 +8,8 @@ import com.poskemon.epro.prservice.domain.dto.PrDetailRes;
 import com.poskemon.epro.prservice.domain.dto.PrHeaderInfo;
 import com.poskemon.epro.prservice.domain.dto.PrRequest;
 import com.poskemon.epro.prservice.domain.dto.PrResponse;
+import com.poskemon.epro.prservice.domain.dto.PrRetrieveReq;
+import com.poskemon.epro.prservice.domain.dto.PrRetrieveRes;
 import com.poskemon.epro.prservice.domain.dto.PurchaseUnitReq;
 import com.poskemon.epro.prservice.domain.dto.PurchaseUnitRes;
 import com.poskemon.epro.prservice.domain.dto.UserInfoDTO;
@@ -16,8 +18,13 @@ import com.poskemon.epro.prservice.domain.entity.PrHeader;
 import com.poskemon.epro.prservice.service.ItemService;
 import com.poskemon.epro.prservice.service.PrService;
 import com.poskemon.epro.prservice.service.WebClientService;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Arrays;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -28,6 +35,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+@Slf4j
 @RestController
 @RequiredArgsConstructor
 public class PrController {
@@ -42,22 +50,19 @@ public class PrController {
      *
      * @return 아이템 리스트
      */
-    @GetMapping("/items/all")
-    public PrResponse findAllItems() {
-        List<Item> foundItems = itemService.findAllItems();
-        if (foundItems.isEmpty()) {
-            return PrResponse.builder().message(Message.NOT_FOUND_ITEMS.getMessage()).build();
-        }
-        return PrResponse.builder().itmeList(foundItems).build();
+    @GetMapping("/items")
+    public List<Item> findAllItems() {
+        return itemService.findAllItems();
     }
 
     /**
      * 아이템 명으로 전체 조회
+     *
      * @param itemDescription 아이템 명
      * @return 아이템 리스트
      */
-    @GetMapping("/items")
-    public List<Item> findItemsByDesc(@RequestParam String itemDescription) {
+    @GetMapping("/items/search")
+    public List<Item> findItemsByDesc(@RequestParam(required = false) String itemDescription) {
         return itemService.findItemsByDesc(itemDescription);
     }
 
@@ -127,6 +132,8 @@ public class PrController {
         }
     }
 
+    // TODO - PrLineSeq로 상세조회 API
+
     /**
      * 구매신청 수정
      * 등록완료 상태에서만 수정 가능함.
@@ -173,6 +180,13 @@ public class PrController {
         }
     }
 
+    /**
+     * PR 목록 조회
+     * 구매단위편성 화면에서 사용
+     *
+     * @param purchaseUnitReq 구매단위편성 조회 조건
+     * @return 조회된 PR 목록
+     */
     @GetMapping("/pr-line")
     public ResponseEntity<?> getPrLinesForPrUnit(PurchaseUnitReq purchaseUnitReq) {
         try {
@@ -195,6 +209,54 @@ public class PrController {
         }
     }
 
+    /**
+     * PR 목록 조회
+     * 구매신청현황 화면에서 사용
+     *
+     * @param prRetrieveReq 구매신청현황 조회 조건
+     * @return 조회된 PR 목록
+     */
+    @GetMapping("/pr/search")
+    public ResponseEntity<?> getPrLines(PrRetrieveReq prRetrieveReq) {
+        try {
+            if (prRetrieveReq.getRequesterNo() == null) {
+                prRetrieveReq.setRequesterNo(-1L);
+            }
+            if (prRetrieveReq.getBuyerNo() == null) {
+                prRetrieveReq.setBuyerNo(-1L);
+            }
+            if (prRetrieveReq.getItemNo() == null) {
+                prRetrieveReq.setItemNo(-1L);
+            }
+            if (prRetrieveReq.getPrStatus() == null || prRetrieveReq.getPrStatus().isEmpty()) {
+                List<String> prStatusList = Arrays.asList(PrStatus.APPROVED.getPrStatus(), PrStatus.ENROLLED.getPrStatus(), PrStatus.REQUEST.getPrStatus());
+                prRetrieveReq.setPrStatus(prStatusList);
+            }
+            if (prRetrieveReq.getPrCreationDate() != null) {
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+
+                LocalDateTime searchStartTime = LocalDate.parse(prRetrieveReq.getPrCreationDate(), formatter).atStartOfDay();
+                prRetrieveReq.setPrCreationDateStart(searchStartTime);
+
+                LocalDateTime searchEndTime = searchStartTime.plusDays(1); // 1일 후
+                prRetrieveReq.setPrCreationDateEnd(searchEndTime);
+            }
+
+            List<PrRetrieveRes> prRetrieveResList = prService.getAllPr(prRetrieveReq);
+            return ResponseEntity.ok().body(prRetrieveResList);
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    /**
+     * 최대 납기일 조회
+     * rfqNo에 해당하는 PrLine 목록 중 최대 납기일 조회
+     *
+     * @param rfqNos rfqNo 리스트
+     * @return rfqNo, NeedByDate 리스트
+     */
     @GetMapping("/pr-line/need-by-date/{rfqNos}")
     public List<NeedByDateSearchDTO> getNeedByDateByRfqNo(@PathVariable List<Long> rfqNos) {
         return prService.getNeedByDateByRfqNo(rfqNos);
