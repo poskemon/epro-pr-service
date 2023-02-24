@@ -38,32 +38,16 @@ public class WebClientServiceImpl implements WebClientService {
         return Arrays.stream(result.block()).collect(Collectors.toList());
     }
 
-    // 게이트웨이에서 uri에서 lb를 사용할 경우 로드밸런싱 추가해야 함!
-//    private Mono<UserDTO[]> webclientFindByBuyerNo(List<Long> buyerNoList) {
-//        String temp = buyerNoList.get(0).toString();
-//        for (int i = 1; i < buyerNoList.size(); i++) {
-//            temp += "," + buyerNoList.get(i);
-//        }
-//        log.info(temp);
-//
-//        return loadBalancedWebClientBuilder().filter(lbFunction).build()
-//                .get()
-//                .uri("http://user-service/users/" + temp)
-//                .retrieve()
-//                .bodyToMono(UserDTO[].class);
-//    }
-
     private Mono<UserInfoDTO[]> webclientFindUsersByUserNo(List<Long> userNos) {
-        WebClient webClient = WebClient.create();
         StringBuilder temp = new StringBuilder(userNos.get(0).toString());
         for (int i = 1; i < userNos.size(); i++) {
             temp.append(",").append(userNos.get(i));
         }
         log.info(temp.toString());
 
-        return webClient
+        return loadBalancedWebClientBuilder().filter(lbFunction).build()
                 .get()
-                .uri("http://localhost:8081/users/" + temp)
+                .uri("http://user-service/users/" + temp)
                 .retrieve()
                 .bodyToMono(UserInfoDTO[].class);
     }
@@ -81,10 +65,9 @@ public class WebClientServiceImpl implements WebClientService {
     }
 
     private Mono<UserInfoDTO[]> webclientFindUsersByRole(int role) {
-        WebClient webClient = WebClient.create();
-        return webClient
+        return loadBalancedWebClientBuilder().filter(lbFunction).build()
                 .get()
-                .uri("http://localhost:8081/role/" + role)
+                .uri("http://user-service/role/" + role)
                 .retrieve()
                 .bodyToMono(UserInfoDTO[].class);
     }
