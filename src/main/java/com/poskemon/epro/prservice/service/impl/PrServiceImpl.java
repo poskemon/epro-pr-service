@@ -354,6 +354,26 @@ public class PrServiceImpl implements PrService {
     }
 
     /**
+     * RfqNo 제거
+     * kafka를 통해 데이터 동기화
+     *
+     * @param message kafka에게 받은 삭제된 rfq의 번호들
+     */
+    @Transactional
+    @KafkaListener(topics = "rfq-delete", groupId = "pr-service")
+    public void deleteRfqNo(String message) throws IOException {
+        System.out.println("receive message : " + message);
+
+        Long[] rfqNos = new Gson().fromJson(message, Long[].class);
+
+        List<PrLine> prLines = prLineRepository.findAllByRfqNoList(rfqNos);
+
+        for (PrLine prLine : prLines) prLine.setRfqNo(null);
+
+        prLineRepository.saveAll(prLines);
+    }
+
+    /**
      * 최대 납기일 조회
      * rfqNo에 해당하는 PrLine 목록 중 최대 납기일 조회
      *

@@ -62,4 +62,7 @@ public interface PrLineRepository extends JpaRepository<PrLine, Long>, PrLineRep
     List<Long> findItemNoByRfqNo(List<Long> rfqNos);
 
     List<PrLine> findPrLinesByRfqNo(Long rfqNo);
+
+    @Query(value = "select p from PrLine p where p.rfqNo in (:rfqNos)")
+    List<PrLine> findAllByRfqNoList(@Param("rfqNos") Long[] rfqNos);
 }
