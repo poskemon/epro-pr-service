@@ -22,10 +22,10 @@ public class PrResponse<T> {
     @JsonProperty("message")
     private String message;
 
-    @JsonProperty("pr_header")
-    private PrHeader prHeader;
+    @JsonProperty("prHeader")
+    private PrHeaderDetailRes prHeader;
 
-    @JsonProperty("pr_lines")
+    @JsonProperty("prLines")
     private List<PrDetailRes> prLines;
 
     @JsonProperty("items")

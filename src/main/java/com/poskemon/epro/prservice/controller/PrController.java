@@ -1,10 +1,10 @@
 package com.poskemon.epro.prservice.controller;
 
-import com.poskemon.epro.prservice.common.constants.Message;
 import com.poskemon.epro.prservice.common.constants.PrStatus;
 import com.poskemon.epro.prservice.common.constants.UserRole;
 import com.poskemon.epro.prservice.domain.dto.NeedByDateSearchDTO;
 import com.poskemon.epro.prservice.domain.dto.PrDetailRes;
+import com.poskemon.epro.prservice.domain.dto.PrHeaderDetailRes;
 import com.poskemon.epro.prservice.domain.dto.PrHeaderInfo;
 import com.poskemon.epro.prservice.domain.dto.PrRequest;
 import com.poskemon.epro.prservice.domain.dto.PrResponse;
@@ -123,9 +123,12 @@ public class PrController {
     @GetMapping("/pr/{prHeaderSeq}")
     public ResponseEntity<?> getPrDetails(@PathVariable Long prHeaderSeq) {
         try {
-            PrHeader prHedaer = prService.getPrHeaderDetail(prHeaderSeq);
-            List<PrDetailRes> prDetailResList = prService.getPrLinesDetail(prHedaer);
-            PrResponse prResponse = PrResponse.builder().prHeader(prHedaer).prLines(prDetailResList).build();
+            PrHeaderDetailRes prHeaderDetailRes = prService.getPrHeaderDetail(prHeaderSeq);
+
+            PrHeader prHeader = prService.getPrHeader(prHeaderSeq);
+            List<PrDetailRes> prDetailResList = prService.getPrLinesDetail(prHeader);
+
+            PrResponse prResponse = PrResponse.builder().prHeader(prHeaderDetailRes).prLines(prDetailResList).build();
             return ResponseEntity.ok().body(prResponse);
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
@@ -144,7 +147,7 @@ public class PrController {
         try {
             // 승인요청, 승인완료 상태인지 확인
             Long prHeaderSeq = prRequest.getPrHeader().getPrHeaderSeq();
-            PrHeader prHeader = prService.getPrHeaderDetail(prHeaderSeq);
+            PrHeader prHeader = prService.getPrHeader(prHeaderSeq);
             if (!PrStatus.ENROLLED.getPrStatus().equals(prHeader.getPrStatus())) {
                 throw new RuntimeException("현재 구매신청 건은 변경할 수 없습니다.");
             }
@@ -167,7 +170,7 @@ public class PrController {
     public ResponseEntity<String> deletePr(@PathVariable Long prHeaderSeq) {
         try {
             // 승인완료 상태인지 확인
-            PrHeader prHeader = prService.getPrHeaderDetail(prHeaderSeq);
+            PrHeader prHeader = prService.getPrHeader(prHeaderSeq);
             if (PrStatus.APPROVED.getPrStatus().equals(prHeader.getPrStatus())) {
                 throw new RuntimeException("승인완료된 구매신청 건은 삭제할 수 없습니다.");
             }
