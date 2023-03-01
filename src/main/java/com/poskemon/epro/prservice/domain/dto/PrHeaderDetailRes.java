@@ -12,14 +12,16 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class PrHeaderDetailRes {
+public class
+
+PrHeaderDetailRes {
     private Long prHeaderSeq;
     private String prNo;
     private Long requesterNo;
     private String requesterName;
     private String approvedDate;
     private String prTitle;
-    private String prPrice;
+    private Long prPrice;
     private String prStatus;
 
     // entity -> dto
@@ -31,7 +33,7 @@ public class PrHeaderDetailRes {
             this.approvedDate = TimesUtils.toString(prHeader.getPrApprovedDate(), "yyyy-MM-dd HH:mm:ss");
         }
         this.prTitle = prHeader.getPrTitle();
-        this.prPrice = CurrencyUtils.toKRWCurrency(prHeader.getPrPrice());
+        this.prPrice = prHeader.getPrPrice();
         this.prStatus = prHeader.getPrStatus();
     }
 }

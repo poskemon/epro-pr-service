@@ -22,7 +22,7 @@ public class PrDetailRes {
     private Long rfqNo;
     private Long unitPrice;
     private Long prQuantity;
-    private String prLinePrice;
+    private Long prLinePrice;
     private String noteToBuyer;
     private LocalDate needByDate;
     private Long prLine;
@@ -36,7 +36,7 @@ public class PrDetailRes {
         this.rfqNo = prLine.getRfqNo();
         this.unitPrice = prLine.getUnitPrice();
         this.prQuantity = prLine.getPrQuantity();
-        this.prLinePrice = CurrencyUtils.toKRWCurrency(prLine.getPrLinePrice());
+        this.prLinePrice = prLine.getPrLinePrice();
         this.noteToBuyer = prLine.getNoteToBuyer();
         this.needByDate = prLine.getNeedByDate();
         this.prLine = prLine.getPrLine();
