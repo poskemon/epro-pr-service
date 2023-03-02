@@ -19,5 +19,4 @@ public class PurchaseUnitReq {
     private String prStatus; // 진행상태
     private String category; // 카테고리
     private Long rfqNo;
-    private String  except; // 등록완료일 경우 조회 불가
 }
