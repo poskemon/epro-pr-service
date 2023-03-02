@@ -1,5 +1,6 @@
 package com.poskemon.epro.prservice.domain.dto;
 
+import com.poskemon.epro.prservice.common.utils.CurrencyUtils;
 import com.poskemon.epro.prservice.domain.entity.Item;
 
 import java.time.LocalDate;
@@ -35,7 +36,7 @@ public class PrDetailRes {
         this.rfqNo = prLine.getRfqNo();
         this.unitPrice = prLine.getUnitPrice();
         this.prQuantity = prLine.getPrQuantity();
-        this.prLineSeq = prLine.getPrLineSeq();
+        this.prLinePrice = prLine.getPrLinePrice();
         this.noteToBuyer = prLine.getNoteToBuyer();
         this.needByDate = prLine.getNeedByDate();
         this.prLine = prLine.getPrLine();

@@ -6,6 +6,7 @@ import com.poskemon.epro.prservice.domain.dto.NeedByDateSearch;
 import com.poskemon.epro.prservice.domain.dto.NeedByDateSearchDTO;
 import com.poskemon.epro.prservice.domain.dto.PoInfo;
 import com.poskemon.epro.prservice.domain.dto.PrDetailRes;
+import com.poskemon.epro.prservice.domain.dto.PrHeaderDetailRes;
 import com.poskemon.epro.prservice.domain.dto.PrHeaderInfo;
 import com.poskemon.epro.prservice.domain.dto.PrRequest;
 import com.poskemon.epro.prservice.domain.dto.PrRetrieveReq;
@@ -28,6 +29,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
@@ -99,7 +101,27 @@ public class PrServiceImpl implements PrService {
      * @return 조회된 PrHeader
      */
     @Override
-    public PrHeader getPrHeaderDetail(Long prHeaderSeq) {
+    public PrHeaderDetailRes getPrHeaderDetail(Long prHeaderSeq) {
+        PrHeader prHeader = prHeaderRepository.findByPrHeaderSeq(prHeaderSeq);
+        PrHeaderDetailRes prHeaderDetailRes = new PrHeaderDetailRes(prHeader);
+
+        List<Long> userNos = new ArrayList<>();
+        userNos.add(prHeaderDetailRes.getRequesterNo());
+        List<UserInfoDTO> requesters = webClientService.findUsersByUserNo(userNos);
+
+        if (requesters != null) {
+                for (UserInfoDTO requester : requesters) {
+                    if (requester.getUserNo().equals(prHeaderDetailRes.getRequesterNo())) {
+                        prHeaderDetailRes.setRequesterName(requester.getUserName());
+                        break;
+                    }
+                }
+            }
+        return prHeaderDetailRes;
+    }
+
+    @Override
+    public PrHeader getPrHeader(Long prHeaderSeq) {
         return prHeaderRepository.findByPrHeaderSeq(prHeaderSeq);
     }
 

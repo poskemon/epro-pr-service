@@ -2,6 +2,7 @@ package com.poskemon.epro.prservice.service;
 
 import com.poskemon.epro.prservice.domain.dto.NeedByDateSearchDTO;
 import com.poskemon.epro.prservice.domain.dto.PrDetailRes;
+import com.poskemon.epro.prservice.domain.dto.PrHeaderDetailRes;
 import com.poskemon.epro.prservice.domain.dto.PrHeaderInfo;
 import com.poskemon.epro.prservice.domain.dto.PrRequest;
 import com.poskemon.epro.prservice.domain.dto.PrRetrieveReq;
@@ -18,7 +19,9 @@ public interface PrService {
 
     void changeStatus(String prStatus, String prNo);
 
-    PrHeader getPrHeaderDetail(Long prHeaderSeq);
+    PrHeaderDetailRes getPrHeaderDetail(Long prHeaderSeq);
+
+    PrHeader getPrHeader(Long prHeaderSeq);
 
     List<PrDetailRes> getPrLinesDetail(PrHeader prHeader);
 

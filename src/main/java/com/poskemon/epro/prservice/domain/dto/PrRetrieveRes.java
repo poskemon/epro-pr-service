@@ -14,7 +14,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class PrRetrieveRes {
-    private Long prLineSeq; // 기본키
+    private Long prHeaderSeq; // 기본키
     private String prNo;
     private String prTitle;
     private String prStatus;
@@ -31,8 +31,8 @@ public class PrRetrieveRes {
     private String noteToBuyer;
 
     public PrRetrieveRes(PrLine prLine) {
+        this.prHeaderSeq = prLine.getPrHeader().getPrHeaderSeq();
         this.prNo = prLine.getPrHeader().getPrNo();
-        this.prLineSeq = prLine.getPrLineSeq();
         this.prTitle = prLine.getPrHeader().getPrTitle();
         this.prStatus = prLine.getPrHeader().getPrStatus();
         this.requesterNo = prLine.getPrHeader().getRequesterNo();
