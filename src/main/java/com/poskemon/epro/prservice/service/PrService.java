@@ -1,6 +1,7 @@
 package com.poskemon.epro.prservice.service;
 
 import com.poskemon.epro.prservice.domain.dto.NeedByDateSearchDTO;
+import com.poskemon.epro.prservice.domain.dto.PrApprovalParam;
 import com.poskemon.epro.prservice.domain.dto.PrDetailRes;
 import com.poskemon.epro.prservice.domain.dto.PrHeaderDetailRes;
 import com.poskemon.epro.prservice.domain.dto.PrHeaderInfo;
@@ -17,7 +18,7 @@ import java.util.List;
 public interface PrService {
     Long prRegist(PrHeader prHeader, List<PrLine> prLines);
 
-    void changeStatus(String prStatus, String prNo);
+    PrHeader changeStatus(String prStatus, Long prHeaderSeq);
 
     PrHeaderDetailRes getPrHeaderDetail(Long prHeaderSeq);
 

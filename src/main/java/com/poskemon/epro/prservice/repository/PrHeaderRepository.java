@@ -12,8 +12,8 @@ import org.springframework.data.jpa.repository.Query;
 public interface PrHeaderRepository extends JpaRepository<PrHeader, Long> {
     @Transactional
     @Modifying
-    @Query(nativeQuery = true, value = "update pr_header set pr_status = :prStatus where pr_no = :prNo")
-    void changeStatus(@Param("prStatus") String prStatus, @Param("prNo") String prNo);
+    @Query(nativeQuery = true, value = "update pr_header set pr_status = :prStatus where pr_header_seq = :prHeaderSeq")
+    void changeStatus(@Param("prStatus") String prStatus, @Param("prHeaderSeq") Long prHeaderSeq);
 
     PrHeader findByPrHeaderSeq(Long prHeaderSeq);
     PrHeader findByPrNo(String prNo);

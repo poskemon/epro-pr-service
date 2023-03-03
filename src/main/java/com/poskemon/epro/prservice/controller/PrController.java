@@ -3,6 +3,7 @@ package com.poskemon.epro.prservice.controller;
 import com.poskemon.epro.prservice.common.constants.PrStatus;
 import com.poskemon.epro.prservice.common.constants.UserRole;
 import com.poskemon.epro.prservice.domain.dto.NeedByDateSearchDTO;
+import com.poskemon.epro.prservice.domain.dto.PrApprovalParam;
 import com.poskemon.epro.prservice.domain.dto.PrDetailRes;
 import com.poskemon.epro.prservice.domain.dto.PrHeaderDetailRes;
 import com.poskemon.epro.prservice.domain.dto.PrHeaderInfo;
@@ -99,18 +100,16 @@ public class PrController {
     /**
      * 구매신청 진행상태 변경 (승인요청, 승인완료)
      *
-     * @return ResponseEntity (변경 결과 메세지)
+     * @return ResponseEntity (변경 결과)
      */
     @PutMapping("/pr/status")
-    public ResponseEntity<PrResponse> changeStatus(@RequestBody PrHeader prHeader) {
+    public ResponseEntity<?> changeStatus(@RequestBody PrApprovalParam prApprovalParam) {
         try {
-            String status = PrStatus.valueOfName(prHeader.getPrStatus()).getPrStatus();
-            prService.changeStatus(status, prHeader.getPrNo());
-            PrResponse prResponse = PrResponse.builder().message("진행 상태가 변경되었습니다.").build();
-            return ResponseEntity.ok().body(prResponse);
+            String prStatus = PrStatus.valueOfName(prApprovalParam.getPrStatus()).getPrStatus();
+            PrHeader prHeader = prService.changeStatus(prStatus, prApprovalParam.getPrHeaderSeq());
+            return ResponseEntity.ok().body(prHeader);
         } catch (Exception e) {
-            PrResponse prResponse = PrResponse.builder().message(e.getMessage()).build();
-            return ResponseEntity.badRequest().body(prResponse);
+            return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
 

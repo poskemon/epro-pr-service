@@ -5,6 +5,7 @@ import com.poskemon.epro.prservice.common.constants.PrStatus;
 import com.poskemon.epro.prservice.domain.dto.NeedByDateSearch;
 import com.poskemon.epro.prservice.domain.dto.NeedByDateSearchDTO;
 import com.poskemon.epro.prservice.domain.dto.PoInfo;
+import com.poskemon.epro.prservice.domain.dto.PrApprovalParam;
 import com.poskemon.epro.prservice.domain.dto.PrDetailRes;
 import com.poskemon.epro.prservice.domain.dto.PrHeaderDetailRes;
 import com.poskemon.epro.prservice.domain.dto.PrHeaderInfo;
@@ -86,12 +87,15 @@ public class PrServiceImpl implements PrService {
     /**
      * 상태 변경 (승인요청, 승인완료)
      *
-     * @param prStatus 변경하려는 상태
-     * @param prNo     변경하려는 prNo
+     * @param prStatus    변경하려는 상태
+     * @param prHeaderSeq 변경하려는 prHeaderSeq
      */
     @Override
-    public void changeStatus(String prStatus, String prNo) {
-        prHeaderRepository.changeStatus(prStatus, prNo);
+    public PrHeader changeStatus(String prStatus, Long prHeaderSeq) {
+        PrHeader prHeader = prHeaderRepository.findByPrHeaderSeq(prHeaderSeq);
+        prHeader.setPrStatus(PrStatus.APPROVED.getPrStatus()); // 상태변경
+        prHeader.setPrApprovedDate(LocalDateTime.now()); // 승인일자
+        return prHeaderRepository.save(prHeader); // 동일한 데이터 수정
     }
 
     /**
@@ -110,13 +114,13 @@ public class PrServiceImpl implements PrService {
         List<UserInfoDTO> requesters = webClientService.findUsersByUserNo(userNos);
 
         if (requesters != null) {
-                for (UserInfoDTO requester : requesters) {
-                    if (requester.getUserNo().equals(prHeaderDetailRes.getRequesterNo())) {
-                        prHeaderDetailRes.setRequesterName(requester.getUserName());
-                        break;
-                    }
+            for (UserInfoDTO requester : requesters) {
+                if (requester.getUserNo().equals(prHeaderDetailRes.getRequesterNo())) {
+                    prHeaderDetailRes.setRequesterName(requester.getUserName());
+                    break;
                 }
             }
+        }
         return prHeaderDetailRes;
     }
 
