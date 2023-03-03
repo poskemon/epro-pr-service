@@ -190,7 +190,7 @@ public class PrController {
     @GetMapping("/pr-line")
     public ResponseEntity<?> getPrLinesForPrUnit(PurchaseUnitReq purchaseUnitReq) {
         try {
-            purchaseUnitReq.setPrStatus(PrStatus.APPROVED.getPrStatus()); // 승인 완료된것만 조회
+            purchaseUnitReq.setPrStatus(PrStatus.APPROVED.getPrStatus()); // 승인 완료된 것만 조회
             if (purchaseUnitReq.getRequesterNo() == null) {
                 purchaseUnitReq.setRequesterNo(-1L);
             }

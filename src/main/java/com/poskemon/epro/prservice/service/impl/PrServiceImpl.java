@@ -93,7 +93,7 @@ public class PrServiceImpl implements PrService {
     @Override
     public PrHeader changeStatus(String prStatus, Long prHeaderSeq) {
         PrHeader prHeader = prHeaderRepository.findByPrHeaderSeq(prHeaderSeq);
-        prHeader.setPrStatus(PrStatus.APPROVED.getPrStatus()); // 상태변경
+        prHeader.setPrStatus(prStatus); // 상태변경
         prHeader.setPrApprovedDate(LocalDateTime.now()); // 승인일자
         return prHeaderRepository.save(prHeader); // 동일한 데이터 수정
     }
