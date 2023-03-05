@@ -19,11 +19,13 @@ import com.poskemon.epro.prservice.domain.entity.PrHeader;
 import com.poskemon.epro.prservice.service.ItemService;
 import com.poskemon.epro.prservice.service.PrService;
 import com.poskemon.epro.prservice.service.WebClientService;
+
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.List;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -144,13 +146,6 @@ public class PrController {
     @PutMapping("/pr")
     public ResponseEntity<?> modifyPr(@RequestBody PrRequest prRequest) {
         try {
-            // 승인요청, 승인완료 상태인지 확인
-            Long prHeaderSeq = prRequest.getPrHeader().getPrHeaderSeq();
-            PrHeader prHeader = prService.getPrHeader(prHeaderSeq);
-            if (!PrStatus.ENROLLED.getPrStatus().equals(prHeader.getPrStatus())) {
-                throw new RuntimeException("현재 구매신청 건은 변경할 수 없습니다.");
-            }
-
             Long modifiedPrHeaderSeq = prService.modifyPr(prRequest);
             return ResponseEntity.ok().body(modifiedPrHeaderSeq);
         } catch (Exception e) {

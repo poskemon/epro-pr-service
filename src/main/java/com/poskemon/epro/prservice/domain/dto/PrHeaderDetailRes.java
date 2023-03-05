@@ -19,7 +19,8 @@ PrHeaderDetailRes {
     private String prNo;
     private Long requesterNo;
     private String requesterName;
-    private String approvedDate;
+    private String prApprovedDate;
+    private String prCreationDate;
     private String prTitle;
     private Long prPrice;
     private String prStatus;
@@ -30,8 +31,9 @@ PrHeaderDetailRes {
         this.prNo = prHeader.getPrNo();
         this.requesterNo = prHeader.getRequesterNo();
         if (prHeader.getPrApprovedDate() != null) {
-            this.approvedDate = TimesUtils.toString(prHeader.getPrApprovedDate(), "yyyy-MM-dd HH:mm:ss");
+            this.prApprovedDate = TimesUtils.toString(prHeader.getPrApprovedDate(), "yyyy-MM-dd HH:mm:ss");
         }
+        this.prCreationDate = TimesUtils.toString(prHeader.getPrCreationDate(), "yyyy-MM-dd HH:mm:ss");
         this.prTitle = prHeader.getPrTitle();
         this.prPrice = prHeader.getPrPrice();
         this.prStatus = prHeader.getPrStatus();
