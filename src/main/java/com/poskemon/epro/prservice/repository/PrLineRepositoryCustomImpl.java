@@ -22,7 +22,7 @@ public class PrLineRepositoryCustomImpl extends QuerydslRepositorySupport implem
     public List<PrHeaderInfo> findPrInfo(Long prHeaderSeq) {
         return from(prHeader)
             .innerJoin(prLine).on(prHeader.prHeaderSeq.eq(prLine.prHeader.prHeaderSeq))
-            .where(prHeader.prHeaderSeq.eq(prHeaderSeq))
+            .where(prHeader.prHeaderSeq.eq(prHeaderSeq).and(prLine.rfqNo.isNotNull()))
             .orderBy(prLine.needByDate.desc())
             .select(Projections.constructor(PrHeaderInfo.class,
                                             prHeader.requesterNo.as("requesterNo"),
