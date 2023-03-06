@@ -95,7 +95,7 @@ public class WebClientServiceImpl implements WebClientService {
         }
         return loadBalancedWebClientBuilder().filter(lbFunction).build()
                                              .get()
-                                             .uri("http://localhost:8081/po/" + temp)
+                                             .uri("http://po-service/po/" + temp)
                                              .retrieve()
                                              .bodyToMono(PoInfo[].class);
     }

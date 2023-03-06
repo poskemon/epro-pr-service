@@ -427,4 +427,9 @@ public class PrServiceImpl implements PrService {
             return prLineRepository.findPrInfo(prLine.getPrHeader().getPrHeaderSeq());
         }
     }
+
+    @Override
+    public List<PrHeader> findPrHeader() {
+        return prHeaderRepository.findAll();
+    }
 }
