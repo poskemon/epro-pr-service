@@ -2,19 +2,7 @@ package com.poskemon.epro.prservice.service.impl;
 
 import com.google.gson.Gson;
 import com.poskemon.epro.prservice.common.constants.PrStatus;
-import com.poskemon.epro.prservice.domain.dto.NeedByDateSearch;
-import com.poskemon.epro.prservice.domain.dto.NeedByDateSearchDTO;
-import com.poskemon.epro.prservice.domain.dto.PoInfo;
-import com.poskemon.epro.prservice.domain.dto.PrDetailRes;
-import com.poskemon.epro.prservice.domain.dto.PrHeaderDetailRes;
-import com.poskemon.epro.prservice.domain.dto.PrHeaderInfo;
-import com.poskemon.epro.prservice.domain.dto.PrRequest;
-import com.poskemon.epro.prservice.domain.dto.PrRetrieveReq;
-import com.poskemon.epro.prservice.domain.dto.PrRetrieveRes;
-import com.poskemon.epro.prservice.domain.dto.PrUpdateDTO;
-import com.poskemon.epro.prservice.domain.dto.PurchaseUnitReq;
-import com.poskemon.epro.prservice.domain.dto.PurchaseUnitRes;
-import com.poskemon.epro.prservice.domain.dto.UserInfoDTO;
+import com.poskemon.epro.prservice.domain.dto.*;
 import com.poskemon.epro.prservice.domain.entity.Item;
 import com.poskemon.epro.prservice.domain.entity.PrHeader;
 import com.poskemon.epro.prservice.domain.entity.PrLine;
@@ -24,17 +12,15 @@ import com.poskemon.epro.prservice.repository.PrHeaderRepository;
 import com.poskemon.epro.prservice.repository.PrLineRepository;
 import com.poskemon.epro.prservice.service.PrService;
 import com.poskemon.epro.prservice.service.WebClientService;
+
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
@@ -86,12 +72,15 @@ public class PrServiceImpl implements PrService {
     /**
      * 상태 변경 (승인요청, 승인완료)
      *
-     * @param prStatus 변경하려는 상태
-     * @param prNo     변경하려는 prNo
+     * @param prStatus    변경하려는 상태
+     * @param prHeaderSeq 변경하려는 prHeaderSeq
      */
     @Override
-    public void changeStatus(String prStatus, String prNo) {
-        prHeaderRepository.changeStatus(prStatus, prNo);
+    public PrHeader changeStatus(String prStatus, Long prHeaderSeq) {
+        PrHeader prHeader = prHeaderRepository.findByPrHeaderSeq(prHeaderSeq);
+        prHeader.setPrStatus(prStatus); // 상태변경
+        prHeader.setPrApprovedDate(LocalDateTime.now()); // 승인일자
+        return prHeaderRepository.save(prHeader); // 동일한 데이터 수정
     }
 
     /**
@@ -110,13 +99,13 @@ public class PrServiceImpl implements PrService {
         List<UserInfoDTO> requesters = webClientService.findUsersByUserNo(userNos);
 
         if (requesters != null) {
-                for (UserInfoDTO requester : requesters) {
-                    if (requester.getUserNo().equals(prHeaderDetailRes.getRequesterNo())) {
-                        prHeaderDetailRes.setRequesterName(requester.getUserName());
-                        break;
-                    }
+            for (UserInfoDTO requester : requesters) {
+                if (requester.getUserNo().equals(prHeaderDetailRes.getRequesterNo())) {
+                    prHeaderDetailRes.setRequesterName(requester.getUserName());
+                    break;
                 }
             }
+        }
         return prHeaderDetailRes;
     }
 
@@ -175,7 +164,13 @@ public class PrServiceImpl implements PrService {
     @Override
     @Transactional
     public Long modifyPr(PrRequest prRequest) {
-        PrHeader prHeader = prHeaderRepository.save(prRequest.getPrHeader());
+        PrHeader prHeader = prHeaderRepository.findById(prRequest.getPrHeader().getPrHeaderSeq())
+                .map(header -> {
+                    header.setPrTitle(prRequest.getPrHeader().getPrTitle());
+                    header.setPrPrice(prRequest.getPrHeader().getPrPrice());
+                    return prHeaderRepository.save(header);
+                })
+                .orElseThrow(() -> new RuntimeException("PR header not found"));
         // prHeaderSeq에 해당하는 prLine 삭제
         prLineRepository.deleteAllByPrHeader(prHeader);
         // prLines 등록
@@ -213,17 +208,17 @@ public class PrServiceImpl implements PrService {
     public List<PurchaseUnitRes> getAllPrWithParams(PurchaseUnitReq purchaseUnitReq) {
         List<PrLine> prLines = prLineRepository.findAllPrWithParams(purchaseUnitReq);
         List<PurchaseUnitRes> purchaseUnitResList = prLines.stream()
-                                                           .map(PurchaseUnitRes::new)
-                                                           .collect(Collectors.toList());
+                .map(PurchaseUnitRes::new)
+                .collect(Collectors.toList());
         // 조회결과가 있을 경우 아래의 코드 실행
         if (!purchaseUnitResList.isEmpty()) {
             // buyerNo, requesterNo 리스트
             List<Long> buyerNos = purchaseUnitResList.stream()
-                                                     .map(purchaseUnitRes -> purchaseUnitRes.getBuyerNo())
-                                                     .collect(Collectors.toList());
+                    .map(purchaseUnitRes -> purchaseUnitRes.getBuyerNo())
+                    .collect(Collectors.toList());
             List<Long> requesterNos = purchaseUnitResList.stream()
-                                                         .map(purchaseUnitRes -> purchaseUnitRes.getRequesterNo())
-                                                         .collect(Collectors.toList());
+                    .map(purchaseUnitRes -> purchaseUnitRes.getRequesterNo())
+                    .collect(Collectors.toList());
 
             // userService 에서 buyerName, requesterName 조회
             List<UserInfoDTO> buyers = webClientService.findUsersByUserNo(buyerNos);
@@ -280,21 +275,21 @@ public class PrServiceImpl implements PrService {
     public List<PrRetrieveRes> getAllPr(PrRetrieveReq prRetrieveReq) {
         List<PrLine> prLines = prLineRepository.findAllPr(prRetrieveReq);
         List<PrRetrieveRes> prRetrieveResList = prLines.stream()
-                                                       .map(PrRetrieveRes::new)
-                                                       .collect(Collectors.toList());
+                .map(PrRetrieveRes::new)
+                .collect(Collectors.toList());
 
         // 조회결과가 있을 경우 아래의 코드 실행
         if (!prRetrieveResList.isEmpty()) {
             // buyerNo, requesterNo, rfqNo 리스트
             List<Long> buyerNos = prRetrieveResList.stream()
-                                                   .map(prRetrieveRes -> prRetrieveRes.getBuyerNo())
-                                                   .collect(Collectors.toList());
+                    .map(prRetrieveRes -> prRetrieveRes.getBuyerNo())
+                    .collect(Collectors.toList());
             List<Long> requesterNos = prRetrieveResList.stream()
-                                                       .map(prRetrieveRes -> prRetrieveRes.getRequesterNo())
-                                                       .collect(Collectors.toList());
+                    .map(prRetrieveRes -> prRetrieveRes.getRequesterNo())
+                    .collect(Collectors.toList());
             List<Long> rfqNos = prRetrieveResList.stream()
-                                                 .map(prRetrieveRes -> prRetrieveRes.getRfqNo())
-                                                 .collect(Collectors.toList());
+                    .map(prRetrieveRes -> prRetrieveRes.getRfqNo())
+                    .collect(Collectors.toList());
             rfqNos.removeIf(Objects::isNull); // rfqNo null 값 제거
 
             // userService 에서 buyerName, requesterName 조회
@@ -406,8 +401,8 @@ public class PrServiceImpl implements PrService {
     public List<NeedByDateSearchDTO> getNeedByDateByRfqNo(List<Long> rfqNos) {
         List<NeedByDateSearch> needBydates = prLineRepository.findAllByRfqNos(rfqNos);
         List<NeedByDateSearchDTO> needByDateSearchDTOS = needBydates.stream()
-                                                                    .map(NeedByDateSearchDTO::new)
-                                                                    .collect(Collectors.toList());
+                .map(NeedByDateSearchDTO::new)
+                .collect(Collectors.toList());
         return needByDateSearchDTOS;
     }
 
