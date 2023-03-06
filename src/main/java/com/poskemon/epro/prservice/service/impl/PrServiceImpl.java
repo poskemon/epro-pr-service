@@ -327,8 +327,8 @@ public class PrServiceImpl implements PrService {
                     Long rfqNo = prRetrieveRes.getRfqNo();
                     for (PoInfo poInfo : poInfos) {
                         if (poInfo.getRfqNo().equals(rfqNo)) {
-                            prRetrieveRes.setPoNo(poInfo.getPoNo());
-                            prRetrieveRes.setPoPrice(poInfo.getPoPrice());
+                            prRetrieveRes.setPoNo(poInfo.getPoSeq());
+                            prRetrieveRes.setPoPrice(poInfo.getPrice());
                             break;
                         }
                     }
