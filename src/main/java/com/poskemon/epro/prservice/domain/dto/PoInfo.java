@@ -9,6 +9,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class PoInfo {
     private Long rfqNo;
-    private Long poNo;
-    private String poPrice;
+    private Long poSeq;
+    private Long price;
 }

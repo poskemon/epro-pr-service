@@ -23,12 +23,12 @@ public class PrRetrieveRes {
     private String requesterName;
     private Long buyerNo;
     private String buyerName;
-    private String prLinePrice;
+    private Long prLinePrice;
     private String prCreationDate;
     private String prApprovedDate;
     private Long rfqNo;
     private Long poNo; // po번호
-    private String poPrice; // 계약금액
+    private Long poPrice; // 계약금액
     private String noteToBuyer;
 
     public PrRetrieveRes(PrLine prLine) {
@@ -40,7 +40,7 @@ public class PrRetrieveRes {
         this.requesterNo = prLine.getPrHeader().getRequesterNo();
         this.buyerNo = prLine.getBuyerNo();
         this.rfqNo = prLine.getRfqNo();
-        this.prLinePrice = CurrencyUtils.toKRWCurrency(prLine.getPrLinePrice());
+        this.prLinePrice = prLine.getPrLinePrice();
         this.prCreationDate = TimesUtils.toString(prLine.getPrHeader().getPrCreationDate(), "yyyy-MM-dd HH:mm:ss");
         if(prLine.getPrHeader().getPrApprovedDate() != null) {
             this.prApprovedDate = TimesUtils.toString(prLine.getPrHeader().getPrApprovedDate(), "yyyy-MM-dd HH:mm:ss");
