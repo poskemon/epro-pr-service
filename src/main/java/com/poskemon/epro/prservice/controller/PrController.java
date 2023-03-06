@@ -285,4 +285,9 @@ public class PrController {
         return prService.retrievePrInfoByRfqNo(rfqNo);
     }
 
+    @GetMapping("/pr")
+    public List<PrHeader> findPrHeader() {
+        return prService.findPrHeader();
+    }
+
 }
