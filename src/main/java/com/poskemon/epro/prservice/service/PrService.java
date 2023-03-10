@@ -34,4 +34,6 @@ public interface PrService {
     List<PrHeaderInfo> retrievePrInfoByRfqNo(Long rfqNo);
 
     List<PrHeader> findPrHeader();
+
+    List<ItemInfo> retrieveItemInfoList(List<Long> rfqNos);
 }
