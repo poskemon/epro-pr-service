@@ -2,6 +2,8 @@ package com.poskemon.epro.prservice.controller;
 
 import com.poskemon.epro.prservice.common.constants.PrStatus;
 import com.poskemon.epro.prservice.common.constants.UserRole;
+import com.poskemon.epro.prservice.domain.dto.CurrentStatusReq;
+import com.poskemon.epro.prservice.domain.dto.CurrentStatusRes;
 import com.poskemon.epro.prservice.domain.dto.NeedByDateSearchDTO;
 import com.poskemon.epro.prservice.domain.dto.PrApprovalParam;
 import com.poskemon.epro.prservice.domain.dto.PrDetailRes;
@@ -282,6 +284,11 @@ public class PrController {
     @GetMapping("/pr")
     public List<PrHeader> findPrHeader() {
         return prService.findPrHeader();
+    }
+
+    @GetMapping("/pr/current-status")
+    public CurrentStatusRes getCurrentStatus(CurrentStatusReq currentStatusReq) {
+        return prService.getCurrentStatus(currentStatusReq);
     }
 
 }

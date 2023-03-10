@@ -1,5 +1,6 @@
 package com.poskemon.epro.prservice.service.impl;
 
+import com.poskemon.epro.prservice.domain.dto.CurrentStatusRes;
 import com.poskemon.epro.prservice.domain.dto.PoInfo;
 import com.poskemon.epro.prservice.domain.dto.UserInfoDTO;
 import com.poskemon.epro.prservice.service.WebClientService;
@@ -100,6 +101,36 @@ public class WebClientServiceImpl implements WebClientService {
                                              .bodyToMono(PoInfo[].class);
     }
 
+    @Override
+    @CircuitBreaker(name = "hello4j", fallbackMethod = "findFallback")
+    public CurrentStatusRes getCurrentRfq(Long rfqNo) {
+        Mono<CurrentStatusRes> result = webclientGetCurrentRfq(rfqNo);
+        return result.block();
+    }
+
+    private Mono<CurrentStatusRes> webclientGetCurrentRfq(Long rfqNo) {
+        return loadBalancedWebClientBuilder().filter(lbFunction).build()
+                                             .get()
+                                             .uri("http://rfq-service/rfq/current-status/" + rfqNo)
+                                             .retrieve()
+                                             .bodyToMono(CurrentStatusRes.class);
+    }
+
+    @Override
+    @CircuitBreaker(name = "hello4j", fallbackMethod = "findFallback")
+    public CurrentStatusRes getCurrentPo(Long poNo) {
+        Mono<CurrentStatusRes> result = webclientGetCurrentPo(poNo);
+        return result.block();
+    }
+
+    private Mono<CurrentStatusRes> webclientGetCurrentPo(Long poNo) {
+        return loadBalancedWebClientBuilder().filter(lbFunction).build()
+                                             .get()
+                                             .uri("http://po-service/po/current-status/" + poNo)
+                                             .retrieve()
+                                             .bodyToMono(CurrentStatusRes.class);
+    }
+
     /**
      * 다른 서비스 장애 발생시 실행되는 fallback 메소드
      *
@@ -107,6 +138,12 @@ public class WebClientServiceImpl implements WebClientService {
      * @return null
      */
     private List<?> findAllFallback(Exception e) {
+        e.printStackTrace();
+        log.error("fallback invoked!");
+        return null;
+    }
+
+    private CurrentStatusRes findFallback(Exception e) {
         e.printStackTrace();
         log.error("fallback invoked!");
         return null;

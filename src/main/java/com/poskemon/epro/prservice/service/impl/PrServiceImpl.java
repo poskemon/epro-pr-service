@@ -165,12 +165,12 @@ public class PrServiceImpl implements PrService {
     @Transactional
     public Long modifyPr(PrRequest prRequest) {
         PrHeader prHeader = prHeaderRepository.findById(prRequest.getPrHeader().getPrHeaderSeq())
-                .map(header -> {
-                    header.setPrTitle(prRequest.getPrHeader().getPrTitle());
-                    header.setPrPrice(prRequest.getPrHeader().getPrPrice());
-                    return prHeaderRepository.save(header);
-                })
-                .orElseThrow(() -> new RuntimeException("PR header not found"));
+                                              .map(header -> {
+                                                  header.setPrTitle(prRequest.getPrHeader().getPrTitle());
+                                                  header.setPrPrice(prRequest.getPrHeader().getPrPrice());
+                                                  return prHeaderRepository.save(header);
+                                              })
+                                              .orElseThrow(() -> new RuntimeException("PR header not found"));
         // prHeaderSeq에 해당하는 prLine 삭제
         prLineRepository.deleteAllByPrHeader(prHeader);
         // prLines 등록
@@ -208,17 +208,17 @@ public class PrServiceImpl implements PrService {
     public List<PurchaseUnitRes> getAllPrWithParams(PurchaseUnitReq purchaseUnitReq) {
         List<PrLine> prLines = prLineRepository.findAllPrWithParams(purchaseUnitReq);
         List<PurchaseUnitRes> purchaseUnitResList = prLines.stream()
-                .map(PurchaseUnitRes::new)
-                .collect(Collectors.toList());
+                                                           .map(PurchaseUnitRes::new)
+                                                           .collect(Collectors.toList());
         // 조회결과가 있을 경우 아래의 코드 실행
         if (!purchaseUnitResList.isEmpty()) {
             // buyerNo, requesterNo 리스트
             List<Long> buyerNos = purchaseUnitResList.stream()
-                    .map(purchaseUnitRes -> purchaseUnitRes.getBuyerNo())
-                    .collect(Collectors.toList());
+                                                     .map(purchaseUnitRes -> purchaseUnitRes.getBuyerNo())
+                                                     .collect(Collectors.toList());
             List<Long> requesterNos = purchaseUnitResList.stream()
-                    .map(purchaseUnitRes -> purchaseUnitRes.getRequesterNo())
-                    .collect(Collectors.toList());
+                                                         .map(purchaseUnitRes -> purchaseUnitRes.getRequesterNo())
+                                                         .collect(Collectors.toList());
 
             // userService 에서 buyerName, requesterName 조회
             List<UserInfoDTO> buyers = webClientService.findUsersByUserNo(buyerNos);
@@ -275,21 +275,21 @@ public class PrServiceImpl implements PrService {
     public List<PrRetrieveRes> getAllPr(PrRetrieveReq prRetrieveReq) {
         List<PrLine> prLines = prLineRepository.findAllPr(prRetrieveReq);
         List<PrRetrieveRes> prRetrieveResList = prLines.stream()
-                .map(PrRetrieveRes::new)
-                .collect(Collectors.toList());
+                                                       .map(PrRetrieveRes::new)
+                                                       .collect(Collectors.toList());
 
         // 조회결과가 있을 경우 아래의 코드 실행
         if (!prRetrieveResList.isEmpty()) {
             // buyerNo, requesterNo, rfqNo 리스트
             List<Long> buyerNos = prRetrieveResList.stream()
-                    .map(prRetrieveRes -> prRetrieveRes.getBuyerNo())
-                    .collect(Collectors.toList());
+                                                   .map(prRetrieveRes -> prRetrieveRes.getBuyerNo())
+                                                   .collect(Collectors.toList());
             List<Long> requesterNos = prRetrieveResList.stream()
-                    .map(prRetrieveRes -> prRetrieveRes.getRequesterNo())
-                    .collect(Collectors.toList());
+                                                       .map(prRetrieveRes -> prRetrieveRes.getRequesterNo())
+                                                       .collect(Collectors.toList());
             List<Long> rfqNos = prRetrieveResList.stream()
-                    .map(prRetrieveRes -> prRetrieveRes.getRfqNo())
-                    .collect(Collectors.toList());
+                                                 .map(prRetrieveRes -> prRetrieveRes.getRfqNo())
+                                                 .collect(Collectors.toList());
             rfqNos.removeIf(Objects::isNull); // rfqNo null 값 제거
 
             // userService 에서 buyerName, requesterName 조회
@@ -401,8 +401,8 @@ public class PrServiceImpl implements PrService {
     public List<NeedByDateSearchDTO> getNeedByDateByRfqNo(List<Long> rfqNos) {
         List<NeedByDateSearch> needBydates = prLineRepository.findAllByRfqNos(rfqNos);
         List<NeedByDateSearchDTO> needByDateSearchDTOS = needBydates.stream()
-                .map(NeedByDateSearchDTO::new)
-                .collect(Collectors.toList());
+                                                                    .map(NeedByDateSearchDTO::new)
+                                                                    .collect(Collectors.toList());
         return needByDateSearchDTOS;
     }
 
@@ -426,5 +426,21 @@ public class PrServiceImpl implements PrService {
     @Override
     public List<PrHeader> findPrHeader() {
         return prHeaderRepository.findAll();
+    }
+
+    @Override
+    public CurrentStatusRes getCurrentStatus(CurrentStatusReq currentStatusReq) {
+        // rfq 상태, rfq 생성일, 입찰게시일시
+        CurrentStatusRes currentRfq = webClientService.getCurrentRfq(currentStatusReq.getRfqNo());
+
+        // po 상태, 승인일시 조회
+        if (currentStatusReq.getPoNo() != null) {
+            CurrentStatusRes currentPo = webClientService.getCurrentPo(currentStatusReq.getPoNo());
+            currentRfq.setPoSeq(currentPo.getPoSeq());
+            currentRfq.setPoStatus(currentPo.getPoStatus());
+            currentRfq.setPoApprovedDate(currentPo.getPoApprovedDate());
+            currentRfq.setPoCreationDate(currentPo.getPoCreationDate());
+        }
+        return currentRfq;
     }
 }

@@ -34,4 +34,7 @@ public interface PrService {
     List<PrHeaderInfo> retrievePrInfoByRfqNo(Long rfqNo);
 
     List<PrHeader> findPrHeader();
+
+    CurrentStatusRes getCurrentStatus(CurrentStatusReq currentStatusReq);
+
 }
