@@ -1,5 +1,6 @@
 package com.poskemon.epro.prservice.service;
 
+import com.poskemon.epro.prservice.domain.dto.CurrentStatusRes;
 import com.poskemon.epro.prservice.domain.dto.PoInfo;
 import com.poskemon.epro.prservice.domain.dto.UserInfoDTO;
 
@@ -11,4 +12,7 @@ public interface WebClientService {
     List<UserInfoDTO> findUsersByRole(int role);
 
     List<PoInfo> getPoInfoByRfqNo(List<Long> rfqNos);
+
+    CurrentStatusRes getCurrentRfq(Long rfqNo);
+    CurrentStatusRes getCurrentPo(Long poNo);
 }

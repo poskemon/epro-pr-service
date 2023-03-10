@@ -2,6 +2,8 @@ package com.poskemon.epro.prservice.service.impl;
 
 import com.google.gson.Gson;
 import com.poskemon.epro.prservice.common.constants.PrStatus;
+import com.poskemon.epro.prservice.domain.dto.CurrentStatusReq;
+import com.poskemon.epro.prservice.domain.dto.CurrentStatusRes;
 import com.poskemon.epro.prservice.domain.dto.ItemInfo;
 import com.poskemon.epro.prservice.domain.dto.ItemInfoDb;
 import com.poskemon.epro.prservice.domain.dto.NeedByDateSearch;
@@ -442,6 +444,22 @@ public class PrServiceImpl implements PrService {
     @Override
     public List<PrHeader> findPrHeader() {
         return prHeaderRepository.findAll();
+    }
+
+    @Override
+    public CurrentStatusRes getCurrentStatus(CurrentStatusReq currentStatusReq) {
+        // rfq 상태, rfq 생성일, 입찰게시일시
+        CurrentStatusRes currentRfq = webClientService.getCurrentRfq(currentStatusReq.getRfqNo());
+
+        // po 상태, 승인일시 조회
+        if (currentStatusReq.getPoNo() != null) {
+            CurrentStatusRes currentPo = webClientService.getCurrentPo(currentStatusReq.getPoNo());
+            currentRfq.setPoSeq(currentPo.getPoSeq());
+            currentRfq.setPoStatus(currentPo.getPoStatus());
+            currentRfq.setPoApprovedDate(currentPo.getPoApprovedDate());
+            currentRfq.setPoCreationDate(currentPo.getPoCreationDate());
+        }
+        return currentRfq;
     }
 
     @Override
