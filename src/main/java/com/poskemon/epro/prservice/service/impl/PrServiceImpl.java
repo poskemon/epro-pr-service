@@ -2,7 +2,23 @@ package com.poskemon.epro.prservice.service.impl;
 
 import com.google.gson.Gson;
 import com.poskemon.epro.prservice.common.constants.PrStatus;
-import com.poskemon.epro.prservice.domain.dto.*;
+import com.poskemon.epro.prservice.domain.dto.CurrentStatusReq;
+import com.poskemon.epro.prservice.domain.dto.CurrentStatusRes;
+import com.poskemon.epro.prservice.domain.dto.ItemInfo;
+import com.poskemon.epro.prservice.domain.dto.ItemInfoDb;
+import com.poskemon.epro.prservice.domain.dto.NeedByDateSearch;
+import com.poskemon.epro.prservice.domain.dto.NeedByDateSearchDTO;
+import com.poskemon.epro.prservice.domain.dto.PoInfo;
+import com.poskemon.epro.prservice.domain.dto.PrDetailRes;
+import com.poskemon.epro.prservice.domain.dto.PrHeaderDetailRes;
+import com.poskemon.epro.prservice.domain.dto.PrHeaderInfo;
+import com.poskemon.epro.prservice.domain.dto.PrRequest;
+import com.poskemon.epro.prservice.domain.dto.PrRetrieveReq;
+import com.poskemon.epro.prservice.domain.dto.PrRetrieveRes;
+import com.poskemon.epro.prservice.domain.dto.PrUpdateDTO;
+import com.poskemon.epro.prservice.domain.dto.PurchaseUnitReq;
+import com.poskemon.epro.prservice.domain.dto.PurchaseUnitRes;
+import com.poskemon.epro.prservice.domain.dto.UserInfoDTO;
 import com.poskemon.epro.prservice.domain.entity.Item;
 import com.poskemon.epro.prservice.domain.entity.PrHeader;
 import com.poskemon.epro.prservice.domain.entity.PrLine;
@@ -12,15 +28,17 @@ import com.poskemon.epro.prservice.repository.PrHeaderRepository;
 import com.poskemon.epro.prservice.repository.PrLineRepository;
 import com.poskemon.epro.prservice.service.PrService;
 import com.poskemon.epro.prservice.service.WebClientService;
-
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Objects;
+import java.util.UUID;
 import java.util.stream.Collectors;
-
 import lombok.RequiredArgsConstructor;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
@@ -442,5 +460,19 @@ public class PrServiceImpl implements PrService {
             currentRfq.setPoCreationDate(currentPo.getPoCreationDate());
         }
         return currentRfq;
+    }
+
+    @Override
+    public List<ItemInfo> retrieveItemInfoList(List<Long> rfqNos) {
+        List<ItemInfoDb> itemInfoDbs = prLineRepository.retrieveItemInfo(rfqNos);
+
+        return itemInfoDbs.stream()
+                          .map(itemInfoDb -> new ItemInfo(
+                              itemInfoDb.getItemNo().intValue(),
+                              itemInfoDb.getItemDescription(),
+                              itemInfoDb.getUom(),
+                              itemInfoDb.getUnitPrice().intValue(),
+                              itemInfoDb.getPrQuantity().intValue()))
+                          .collect(Collectors.toList());
     }
 }

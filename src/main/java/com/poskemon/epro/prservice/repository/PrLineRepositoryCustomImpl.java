@@ -1,11 +1,12 @@
 package com.poskemon.epro.prservice.repository;
 
+import com.poskemon.epro.prservice.domain.dto.ItemInfoDb;
 import com.poskemon.epro.prservice.domain.dto.PrHeaderInfo;
 import com.poskemon.epro.prservice.domain.entity.PrLine;
+import com.poskemon.epro.prservice.domain.entity.QItem;
 import com.poskemon.epro.prservice.domain.entity.QPrHeader;
 import com.poskemon.epro.prservice.domain.entity.QPrLine;
 import com.querydsl.core.types.Projections;
-import com.querydsl.core.types.dsl.Expressions;
 import java.util.List;
 import org.springframework.data.jpa.repository.support.QuerydslRepositorySupport;
 
@@ -17,6 +18,7 @@ public class PrLineRepositoryCustomImpl extends QuerydslRepositorySupport implem
 
     QPrHeader prHeader = QPrHeader.prHeader;
     QPrLine prLine = QPrLine.prLine1;
+    QItem item = QItem.item;
 
     @Override
     public List<PrHeaderInfo> findPrInfo(Long prHeaderSeq) {
@@ -34,5 +36,19 @@ public class PrLineRepositoryCustomImpl extends QuerydslRepositorySupport implem
                                             prLine.prLinePrice.as("price"),
                                             prLine.needByDate)
             ).fetch();
+    }
+
+    @Override
+    public List<ItemInfoDb> retrieveItemInfo(List<Long> rfqNos) {
+        return from(prLine)
+            .innerJoin(item).on(prLine.item.itemNo.eq(item.itemNo))
+            .where(prLine.rfqNo.in(rfqNos))
+            .select(Projections.constructor(ItemInfoDb.class,
+                                            item.itemNo,
+                                            item.itemDescription,
+                                            item.uom,
+                                            prLine.unitPrice,
+                                            prLine.prQuantity))
+            .fetch();
     }
 }

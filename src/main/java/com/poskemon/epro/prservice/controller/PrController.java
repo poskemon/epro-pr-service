@@ -4,6 +4,7 @@ import com.poskemon.epro.prservice.common.constants.PrStatus;
 import com.poskemon.epro.prservice.common.constants.UserRole;
 import com.poskemon.epro.prservice.domain.dto.CurrentStatusReq;
 import com.poskemon.epro.prservice.domain.dto.CurrentStatusRes;
+import com.poskemon.epro.prservice.domain.dto.ItemInfo;
 import com.poskemon.epro.prservice.domain.dto.NeedByDateSearchDTO;
 import com.poskemon.epro.prservice.domain.dto.PrApprovalParam;
 import com.poskemon.epro.prservice.domain.dto.PrDetailRes;
@@ -279,6 +280,18 @@ public class PrController {
     @GetMapping("/pr-line/{rfqNo}")
     public List<PrHeaderInfo> retrievePrInfoByRfqNo(@PathVariable Long rfqNo) {
         return prService.retrievePrInfoByRfqNo(rfqNo);
+    }
+
+    /**
+     * RFQ 번호 리스트로 Item 관련 정보를 조회하는 API
+     * Rfq 리스트로 Item 정보를 조회
+     *
+     * @param rfqNos 조회할 rfq 번호
+     * @return 아이템 번호를 리스트로 반환
+     */
+    @PostMapping("/item-info-list")
+    public List<ItemInfo> retrieveItemInfoList(@RequestBody List<Long> rfqNos) {
+        return prService.retrieveItemInfoList(rfqNos);
     }
 
     @GetMapping("/pr")
