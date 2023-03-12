@@ -19,4 +19,6 @@ public class ItemInfo {
 
     private Integer mat_bpa_agree_qt; // pr_quantity
 
+    private String description;
+
 }
