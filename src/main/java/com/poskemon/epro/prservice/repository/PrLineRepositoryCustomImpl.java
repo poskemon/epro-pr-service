@@ -48,7 +48,8 @@ public class PrLineRepositoryCustomImpl extends QuerydslRepositorySupport implem
                                             item.itemDescription,
                                             item.uom,
                                             prLine.unitPrice,
-                                            prLine.prQuantity))
+                                            prLine.prQuantity,
+                                            item.category))
             .fetch();
     }
 }

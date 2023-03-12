@@ -472,7 +472,8 @@ public class PrServiceImpl implements PrService {
                               itemInfoDb.getItemDescription(),
                               itemInfoDb.getUom(),
                               itemInfoDb.getUnitPrice().intValue(),
-                              itemInfoDb.getPrQuantity().intValue()))
+                              itemInfoDb.getPrQuantity().intValue(),
+                              itemInfoDb.getCategory()))
                           .collect(Collectors.toList());
     }
 }

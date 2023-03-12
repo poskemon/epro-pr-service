@@ -19,4 +19,6 @@ public class ItemInfoDb {
 
     private Long prQuantity;
 
+    private String category;
+
 }
