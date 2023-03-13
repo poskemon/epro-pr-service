@@ -195,9 +195,9 @@ public class PrController {
             if (purchaseUnitReq.getBuyerNo() == null) {
                 purchaseUnitReq.setBuyerNo(-1L);
             }
-            if (purchaseUnitReq.getRfqNo() == null) {
-                purchaseUnitReq.setRfqNo(-1L);
-            }
+            // if (purchaseUnitReq.getRfqNo() == null) {
+            //     purchaseUnitReq.setRfqNo(-1L);
+            // }
             List<PurchaseUnitRes> purchaseUnitResList = prService.getAllPrWithParams(purchaseUnitReq);
             return ResponseEntity.ok().body(purchaseUnitResList);
         } catch (Exception e) {
