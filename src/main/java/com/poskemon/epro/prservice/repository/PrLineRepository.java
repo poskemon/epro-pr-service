@@ -30,7 +30,7 @@ public interface PrLineRepository extends JpaRepository<PrLine, Long>, PrLineRep
         "and (:#{#purchaseUnitReq.spec} is null or i.spec = :#{#purchaseUnitReq.spec}) " +
         "and (ph.prStatus = :#{#purchaseUnitReq.prStatus}) " +
         "and (:#{#purchaseUnitReq.category} is null or i.category = :#{#purchaseUnitReq.category}) " +
-        "and (:#{#purchaseUnitReq.rfqNo} = -1L or pl.rfqNo = :#{#purchaseUnitReq.rfqNo}) order by ph.prHeaderSeq desc, pl.prLine")
+        "and (:#{#purchaseUnitReq.rfqNo} = -1L or pl.rfqNo is null) order by ph.prHeaderSeq desc, pl.prLine")
     List<PrLine> findAllPrWithParams(@Param("purchaseUnitReq") PurchaseUnitReq purchaseUnitReq);
 
     @Query(value = "select pl, ph, i " +
