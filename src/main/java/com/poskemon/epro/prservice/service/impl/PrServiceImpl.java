@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.poskemon.epro.prservice.common.constants.PrStatus;
 import com.poskemon.epro.prservice.domain.dto.CurrentStatusReq;
 import com.poskemon.epro.prservice.domain.dto.CurrentStatusRes;
+import com.poskemon.epro.prservice.domain.dto.ItemCategoryDTO;
 import com.poskemon.epro.prservice.domain.dto.ItemInfo;
 import com.poskemon.epro.prservice.domain.dto.ItemInfoDb;
 import com.poskemon.epro.prservice.domain.dto.NeedByDateSearch;
@@ -475,5 +476,17 @@ public class PrServiceImpl implements PrService {
                               itemInfoDb.getPrQuantity().intValue(),
                               itemInfoDb.getCategory()))
                           .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<ItemCategoryDTO> itemCategory() {
+        List<ItemCategoryDTO> result = new ArrayList<>();
+        List<PrLine> list = prLineRepository.findAll();
+
+        for (PrLine prLine : list)
+            result.add(new ItemCategoryDTO(prLine.getPrHeader().getRequesterNo(),
+                                           prLine.getItem().getCategory()));
+
+        return result;
     }
 }

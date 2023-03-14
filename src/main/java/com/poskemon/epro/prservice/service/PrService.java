@@ -38,4 +38,6 @@ public interface PrService {
     CurrentStatusRes getCurrentStatus(CurrentStatusReq currentStatusReq);
 
     List<ItemInfo> retrieveItemInfoList(List<Long> rfqNos);
+
+    List<ItemCategoryDTO> itemCategory();
 }
