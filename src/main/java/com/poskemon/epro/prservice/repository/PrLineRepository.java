@@ -1,5 +1,6 @@
 package com.poskemon.epro.prservice.repository;
 
+import com.poskemon.epro.prservice.domain.dto.ItemCategoryDTO;
 import com.poskemon.epro.prservice.domain.dto.NeedByDateSearch;
 import com.poskemon.epro.prservice.domain.dto.PrRetrieveReq;
 import com.poskemon.epro.prservice.domain.dto.PrUpdateDTO;
